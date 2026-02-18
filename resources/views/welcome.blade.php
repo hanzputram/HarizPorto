@@ -14,6 +14,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Portfolio | Hariz 3D</title>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,8 +32,6 @@
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
         <!-- Styles / Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-
         <!-- DARK MODE THEME OVERRIDES -->
         <style>
             /* =========================
