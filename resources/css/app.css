@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* scan semua blade */
+@source "../views/**/*.blade.php";
+
+/* scan js */
+@source "../js/**/*.js";
 
 @theme {
     --color-lavender-light: #f8f7ff;
