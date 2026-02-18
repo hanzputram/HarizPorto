@@ -1,10 +1,7 @@
 @import "tailwindcss";
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
-/* scan semua blade */
 @source "../views/**/*.blade.php";
-
-/* scan js */
 @source "../js/**/*.js";
 
 @theme {
@@ -155,4 +152,18 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-lavender) var(--color-lavender-light);
+}
+
+@layer base {
+  button {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-semibold border border-black/10 bg-black text-white;
+  }
+
+  input, textarea, select {
+    @apply w-full rounded-xl border border-black/10 bg-white px-4 py-2 outline-none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-black/10 border-black/20;
+  }
 }
