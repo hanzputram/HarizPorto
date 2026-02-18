@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      class="scroll-smooth"
+      x-data="{
+        dark: localStorage.getItem('theme') === 'dark',
+        toggle(){
+          this.dark = !this.dark;
+          localStorage.setItem('theme', this.dark ? 'dark' : 'light');
+        }
+      }"
+      :class="{ 'dark': dark }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +20,9 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
+        <!-- Alpine (for Dark Mode Toggle) -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
         <!-- AOS (Animate on Scroll) -->
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
@@ -21,17 +33,145 @@
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        <!-- DARK MODE THEME OVERRIDES -->
+        <style>
+            /* =========================
+               THEME TOKENS (LIGHT)
+            ========================== */
+            :root{
+                --bg: #ffffff;
+                --bg-soft: #FBFBFF;
+                --text: #0b0b0f;
+                --border: rgba(0,0,0,.06);
+                --shadow: rgba(106, 90, 205, .12);
+            }
 
+            [x-cloak] { display: none !important; }
+
+            /* =========================
+               THEME TOKENS (DARK)
+            ========================== */
+            html.dark{
+                color-scheme: dark;
+                --bg: #070810;
+                --bg-soft: #0b0d18;
+                --text: rgba(255,255,255,.92);
+                --border: rgba(255,255,255,.08);
+                --shadow: rgba(184, 167, 255, .18);
+            }
+
+            /* =========================
+               GLOBAL BASE
+            ========================== */
+            body{
+                background: var(--bg) !important;
+                color: var(--text) !important;
+            }
+
+            /* Background overrides for hardcoded classes */
+            .bg-white{ background-color: var(--bg) !important; }
+            .bg-\[\#FBFBFF\]{ background-color: var(--bg-soft) !important; }
+
+            /* Border overrides */
+            .border-black\/5{ border-color: var(--border) !important; }
+            .border-black\/10{ border-color: var(--border) !important; }
+            .border-t.border-black\/5{ border-top-color: var(--border) !important; }
+            .border-b.border-black\/5{ border-bottom-color: var(--border) !important; }
+
+            /* Text overrides ONLY in dark mode */
+            html.dark .text-black{ color: var(--text) !important; }
+            html.dark .text-black\/80{ color: rgba(255,255,255,.78) !important; }
+            html.dark .text-black\/70{ color: rgba(255,255,255,.70) !important; }
+            html.dark .text-black\/60{ color: rgba(255,255,255,.62) !important; }
+            html.dark .text-black\/50{ color: rgba(255,255,255,.55) !important; }
+            html.dark .text-black\/40{ color: rgba(255,255,255,.52) !important; }
+            html.dark .text-black\/30{ color: rgba(255,255,255,.32) !important; }
+            html.dark .text-black\/20{ color: rgba(255,255,255,.20) !important; }
+            html.dark .text-black\/10{ color: rgba(255,255,255,.12) !important; }
+
+            /* bg black/5 used as line/track -> use border token in dark */
+            html.dark .bg-black\/5{ background-color: var(--border) !important; }
+
+            /* Header backdrop in dark */
+            html.dark header{
+                background: rgba(7,8,16,.60) !important;
+                border-bottom-color: var(--border) !important;
+            }
+
+            /* Cards/buttons/inputs (if defined in app.css, this helps) */
+            html.dark .neo-card{
+                background: var(--bg-soft) !important;
+                border-color: var(--border) !important;
+                box-shadow: 0 20px 60px var(--shadow) !important;
+            }
+            html.dark .neo-btn{
+                background: rgba(255,255,255,.92) !important;
+                color: #070810 !important;
+                border-color: rgba(255,255,255,.12) !important;
+            }
+            html.dark .neo-input{
+                background: rgba(255,255,255,.04) !important;
+                color: var(--text) !important;
+                border-color: var(--border) !important;
+            }
+            html.dark .neo-input::placeholder{
+                color: rgba(255,255,255,.35) !important;
+            }
+
+            /* Hover inversion that exists in your buttons */
+            html.dark .hover\:bg-black:hover{ background-color: rgba(255,255,255,.92) !important; }
+            html.dark .hover\:text-white:hover{ color: #070810 !important; }
+
+            /* Blueprint background slightly stronger in dark */
+            html.dark .bg-blueprint-grid{ opacity: .06 !important; }
+
+            /* Doodles a bit calmer in dark */
+            html.dark .doodle{ opacity: .22 !important; }
+
+            /* =========================
+               REVIEWS: prevent shadow clipping (UPDATED)
+            ========================== */
+            .reviews-swiper,
+            .reviews-swiper .swiper-wrapper,
+            .reviews-swiper .swiper-slide{
+                overflow: visible !important;
+            }
+
+            /* Navbar specific dark mode compatibility */
+            html.dark .nav-link {
+                color: rgba(255, 255, 255, 0.45) !important;
+            }
+            html.dark .nav-link:hover {
+                color: #ffffff !important;
+            }
+            html.dark .nav-link.active {
+                background: rgba(201, 160, 204, 0.15) !important;
+                color: #ffffff !important;
+            }
+
+            /* Social buttons theme compatibility - Glassy idle state */
+            html.dark .neo-social-btn {
+                background: rgba(255, 255, 255, 0.03) !important;
+                border-color: rgba(255, 255, 255, 0.08) !important;
+                color: rgba(255, 255, 255, 0.8) !important;
+            }
+            html.dark .neo-social-btn:hover {
+                background: rgba(201, 160, 204, 0.2) !important;
+                border-color: #c9a0cc !important;
+                color: #ffffff !important;
+            }
+        </style>
     </head>
+
     <body class="overflow-x-hidden bg-lavender-light selection:bg-lavender selection:text-black font-sans">
-        
+
         <!-- Navigation Bar -->
-        <header class="fixed top-0 left-0 w-full z-50 border-b border-black/5 backdrop-blur-md">
+        <header class="fixed top-0 left-0 w-full z-50 border-b border-black/5 backdrop-blur-md transition-all duration-300">
             <nav class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <div class="flex-1">
-                    <span class="font-bold text-xl tracking-tighter text-black">HARIZ.</span>
+                    <span class="font-bold text-xl tracking-tighter text-black transition-colors">HARIZ.</span>
                 </div>
-                
+
                 <div class="hidden md:flex items-center justify-center gap-10 flex-2">
                     <a href="#hero" class="nav-link">Home</a>
                     <a href="#capabilities" class="nav-link">Capabilities</a>
@@ -44,6 +184,27 @@
 
                 <div class="flex items-center justify-end gap-3 flex-1">
 
+                    <!-- DARK MODE TOGGLE (UPDATED ICON SWITCH) -->
+                    <button
+                        @click="toggle()"
+                        class="neo-social-btn flex items-center justify-center"
+                        :title="dark ? 'Light mode' : 'Dark mode'"
+                        aria-label="Toggle dark mode"
+                    >
+                        <!-- Moon (when light mode) -->
+                        <svg x-show="!dark" x-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                             class="w-4 h-4 text-black/80">
+                            <path fill="currentColor"
+                                  d="M21.64 13a1 1 0 0 0-1.05-.14A8.05 8.05 0 0 1 17.22 13.6A8.15 8.15 0 0 1 10.4 2.78a1 1 0 0 0-1.19-1.2A10 10 0 1 0 22 14.19a1 1 0 0 0-.36-1.19Z"/>
+                        </svg>
+
+                        <!-- Sun (when dark mode) -->
+                        <svg x-show="dark" x-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                             class="w-4 h-4 text-white/90">
+                            <path fill="currentColor"
+                                  d="M12 18a6 6 0 1 1 0-12a6 6 0 0 1 0 12Zm0-16a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1Zm0 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1ZM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1Zm18 0a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1ZM5.05 5.05a1 1 0 0 1 1.41 0l.71.71a1 1 0 1 1-1.41 1.41l-.71-.71a1 1 0 0 1 0-1.41Zm12.02 12.02a1 1 0 0 1 1.41 0l.71.71a1 1 0 1 1-1.41 1.41l-.71-.71a1 1 0 0 1 0-1.41ZM18.95 5.05a1 1 0 0 1 0 1.41l-.71.71a1 1 0 1 1-1.41-1.41l.71-.71a1 1 0 0 1 1.41 0ZM7.17 16.83a1 1 0 0 1 0 1.41l-.71.71a1 1 0 1 1-1.41-1.41l.71-.71a1 1 0 0 1 1.41 0Z"/>
+                        </svg>
+                    </button>
 
                     @if(!empty($settings['social_whatsapp']))
                     <a href="{{ $settings['social_whatsapp'] }}" target="_blank" class="neo-social-btn" title="WhatsApp">
@@ -61,8 +222,6 @@
                     </a>
                     @endif
                 </div>
-
-
             </nav>
         </header>
 
@@ -190,7 +349,7 @@
                 <div class="relative px-4">
                     <!-- Pipeline Connector line (Background Track) -->
                     <div class="absolute top-[45px] left-0 w-full h-px bg-black/5 z-0 transition-colors"></div>
-                    
+
                     <div class="swiper workflow-swiper overflow-visible">
                         <div class="swiper-wrapper">
                             @forelse($workflows as $step)
@@ -203,7 +362,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="text-center lg:text-left">
                                     <h4 class="text-2xl font-extrabold mb-4 tracking-tighter uppercase text-black group-hover/node:text-lavender-dark transition-colors">{{ $step->title }}</h4>
                                     <div class="w-12 h-1 bg-black/5 mb-6 mx-auto lg:mx-0 group-hover/node:w-20 group-hover/node:bg-lavender transition-all duration-500"></div>
@@ -265,7 +424,7 @@
                     <h2 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-tighter uppercase text-black transition-colors">My Works</h2>
                     <p class="text-black/30 font-bold uppercase tracking-widest text-[10px] transition-colors">Check out some of our awesome projects with creative ideas.</p>
                 </div>
-                
+
                 <div class="grid sm:grid-cols-2 gap-8 md:gap-12 lg:gap-16 mb-20 text-left">
                     @foreach($portfolios->take(4) as $work)
                     <div class="group" data-aos="fade-up">
@@ -299,7 +458,7 @@
         <section id="stats-section" class="py-24 bg-white relative overflow-hidden transition-colors">
             <!-- Blueprint Mesh Background -->
             <div class="bg-blueprint-grid absolute inset-0 z-0 opacity-[0.03]"></div>
-            
+
             <div class="max-w-7xl mx-auto px-6 relative z-10">
                 <div class="flex flex-col lg:flex-row justify-center items-center gap-12 lg:gap-20">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto">
@@ -307,7 +466,7 @@
                         <div class="p-10 bg-[#FBFBFF] border border-black/5 rounded-[40px] shadow-2xl shadow-lavender/5 group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 100 }}">
                             <!-- Floating Icon Decor -->
                             <div class="absolute -top-4 -right-4 w-20 h-20 bg-lavender/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-                            
+
                             <div class="relative z-10 flex flex-col items-center text-center">
                                 <div class="flex items-baseline justify-center mb-2">
                                     <span class="text-7xl font-extrabold tracking-tighter text-black stat-counter transition-colors" data-value="{{ $stat->value }}">0</span>
@@ -374,11 +533,11 @@
                     </div>
                 </div>
                 @else
-                <div class="relative px-12" data-aos="fade-up">
-                    <div class="swiper reviews-swiper">
+                <div class="relative px-12 " data-aos="fade-up">
+                    <div class="swiper reviews-swiper overflow-visible">
                         <div class="swiper-wrapper">
                             @foreach($reviews as $review)
-                            <div class="swiper-slide p-4 h-auto">
+                            <div class="swiper-slide p-6 h-auto">
                                 <div class="neo-card p-10 bg-lavender-light/10 border-black/5 h-full flex flex-col justify-between transition-colors">
                                     <div>
                                         <div class="flex text-lavender-dark mb-4 drop-shadow-sm">
@@ -420,7 +579,7 @@
                                 @if($price->is_featured)
                                 <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 bg-lavender text-lavender-dark text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-lg shadow-lavender/20">Recommended</div>
                                 @endif
-                                
+
                                 <h4 class="font-bold text-lavender-dark mb-3 uppercase tracking-widest text-[10px]">{{ $price->plan_name }}</h4>
                                 <div class="text-4xl font-extrabold mb-8 tracking-tighter text-black transition-colors">{{ $price->price }}</div>
                                 <ul class="space-y-4 mb-10">
@@ -480,7 +639,7 @@
                                 </div>
                                 <div class="flex-1 pt-1">
                                     <h4 class="font-bold text-xl tracking-tight mb-0 text-black group-hover/faq:text-lavender-dark transition-colors">{{ $faq->question }}</h4>
-                                    
+
                                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-700 ease-in-out opacity-0">
                                         <div class="pt-8 pb-4 text-black/50 font-medium leading-relaxed italic transition-colors">
                                             "{{ $faq->answer }}"
@@ -511,18 +670,8 @@
                 const card = btn.closest('.neo-card');
                 const answer = btn.querySelector('.faq-answer');
                 const icon = btn.querySelector('.plus-icon');
-                
+
                 const isOpen = answer.classList.contains('active');
-                
-                // Reset others (optional - commented out to allow multiple open)
-                /*
-                document.querySelectorAll('.faq-answer').forEach(el => {
-                    el.classList.remove('active');
-                    el.style.maxHeight = null;
-                    el.style.opacity = 0;
-                });
-                document.querySelectorAll('.plus-icon').forEach(el => el.classList.remove('rotate-45'));
-                */
 
                 if (!isOpen) {
                     answer.classList.add('active');
@@ -576,7 +725,7 @@
                     @endif
                     @if(!empty($settings['social_instagram']))
                     <a href="{{ $settings['social_instagram'] }}" target="_blank" class="neo-social-btn" title="Instagram">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                     </a>
                     @endif
                 </div>
@@ -604,12 +753,8 @@
                     prevEl: '.swiper-prev',
                 },
                 breakpoints: {
-                    768: {
-                        slidesPerView: 2,
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                    },
+                    768: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 },
                 }
             });
 
@@ -621,12 +766,8 @@
                     prevEl: '.pipeline-prev',
                 },
                 breakpoints: {
-                    640: {
-                        slidesPerView: 2,
-                    },
-                    1024: {
-                        slidesPerView: 4,
-                    },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 4 },
                 }
             });
 
@@ -659,19 +800,18 @@
             // Counting Animation
             const countStats = () => {
                 const counters = document.querySelectorAll('.stat-counter');
-                
+
                 counters.forEach(counter => {
                     const targetStr = counter.getAttribute('data-value') || "0";
                     const target = parseInt(targetStr.replace(/[^0-9]/g, '')) || 0;
-                    let count = 0;
-                    
+
                     const duration = 2000; // 2 seconds
                     const startTime = performance.now();
 
                     const updateCount = (timestamp) => {
                         const progress = Math.min((timestamp - startTime) / duration, 1);
                         const current = Math.floor(progress * target);
-                        
+
                         counter.innerText = current.toLocaleString();
 
                         if (progress < 1) {
@@ -680,7 +820,7 @@
                             counter.innerText = target.toLocaleString();
                         }
                     };
-                    
+
                     requestAnimationFrame(updateCount);
                 });
             };
