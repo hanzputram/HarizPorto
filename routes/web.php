@@ -27,7 +27,8 @@ Route::get('/', function () {
 
 Route::get('/portfolio', function () {
     $portfolios = Portfolio::latest()->get();
-    return view('portfolio.index', compact('portfolios'));
+    $settings = Setting::pluck('value', 'key');
+    return view('portfolio.index', compact('portfolios', 'settings'));
 })->name('portfolio.index');
 
 // Auth Routes
