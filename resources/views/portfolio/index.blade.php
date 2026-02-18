@@ -25,7 +25,7 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12 text-left">
             @foreach($portfolios as $work)
             <div class="group">
-                <a href="{{ $work->image_url ?? '#' }}" target="_blank" class="block neo-card aspect-square bg-white flex items-center justify-center overflow-hidden mb-6 relative">
+                <a href="{{ $work->project_url ?? $work->image_url ?? '#' }}" target="_blank" class="block neo-card aspect-square bg-white flex items-center justify-center overflow-hidden mb-6 relative">
                     @if($work->image_url)
                         <img src="{{ $work->image_url }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                     @else

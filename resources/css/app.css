@@ -19,7 +19,7 @@
 
 @layer base {
     body {
-        @apply bg-lavender-light text-black font-sans selection:bg-skyblue selection:text-black;
+        @apply bg-lavender-light text-black font-sans selection:bg-lavender selection:text-black;
         cursor:
             url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='40' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>✨</text></svg>")
                 16 16,
@@ -38,11 +38,11 @@
 
 @layer components {
     .neo-card {
-        @apply bg-white border-[1.5px] border-black/10 shadow-[0px_8px_30px_rgba(0,0,0,0.04)] rounded-2xl transition-all duration-300;
+        @apply bg-white border-[1.5px] border-black/10 shadow-[0px_8px_30px_rgba(0,0,0,0.02)] rounded-[32px] transition-all duration-500;
     }
 
     .neo-card:hover {
-        @apply -translate-y-1 shadow-[0px_20px_40px_rgba(201,160,204,0.15)];
+        @apply -translate-y-2 shadow-[0px_30px_60px_rgba(201,160,204,0.12)];
         border-color: var(--color-lavender-dark);
     }
 
@@ -59,11 +59,11 @@
     }
 
     .nav-link {
-        @apply text-sm font-black uppercase tracking-widest text-black/30 hover:text-black transition-colors;
+        @apply text-[10px] font-black uppercase tracking-widest text-black/30 hover:text-black transition-all cursor-pointer;
     }
 
     .nav-link.active {
-        @apply text-black;
+        @apply text-black bg-lavender/40 px-5 py-2.5 rounded-full;
     }
 
     .text-white\! {
