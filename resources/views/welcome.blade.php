@@ -649,19 +649,37 @@
               {{ $price->plan_name }}
             </span>
 
-            <div class="text-5xl font-black mt-3 tracking-tighter text-gray-900 dark:text-white">
-              {{ $price->price }}
+            <div class="flex items-baseline gap-2 mt-3">
+              <span class="text-5xl font-black tracking-tighter text-gray-900 dark:text-white">
+                {{ $price->price }}
+              </span>
+              @if($price->price_subtitle)
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  {{ $price->price_subtitle }}
+                </span>
+              @endif
             </div>
 
             <div class="mt-4 h-px w-full" style="background: linear-gradient(to right, transparent, {{ $price->is_featured ? 'rgba(217,70,239,0.3)' : 'rgba(128,128,128,0.15)' }}, transparent)"></div>
           </div>
 
           <!-- features -->
+          @if($price->benefits)
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed mb-6 px-1">
+              {{ $price->benefits }}
+            </p>
+          @endif
+
           <ul class="flex-1 space-y-3 my-8">
-            @foreach(explode(',', $price->features) as $feature)
+            @php
+              $featuresList = str_contains($price->features, "\n") 
+                ? explode("\n", $price->features) 
+                : explode(",", $price->features);
+            @endphp
+            @foreach($featuresList as $feature)
               <li class="flex items-center gap-3 text-sm px-4 py-3 rounded-xl
                          {{ $price->is_featured ? 'feature-item-featured' : 'feature-item' }}">
-                <span class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
+                <span class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
                       style="background: {{ $price->is_featured ? 'rgba(217,70,239,0.15)' : 'rgba(6,182,212,0.15)' }}">
                   <i class="fa-solid fa-check text-[9px]"
                      style="color: {{ $price->is_featured ? '#D946EF' : '#06B6D4' }}"></i>

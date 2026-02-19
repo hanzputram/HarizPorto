@@ -852,17 +852,21 @@
             <div id="add-pricing-form" class="hidden dash-card p-7 mb-8 animate-fade-in">
                 <form action="/admin/pricing" method="POST" class="space-y-5">
                     @csrf
-                    <div class="grid sm:grid-cols-3 gap-5">
+                    <div class="grid sm:grid-cols-2 gap-8">
                         <div><label class="field-label">Plan Name</label><input type="text" name="plan_name" placeholder="e.g. Starter" class="dash-input" required></div>
                         <div><label class="field-label">Price</label><input type="text" name="price" placeholder="e.g. $499" class="dash-input" required></div>
-                        <div class="flex items-end pb-1">
+                        <div><label class="field-label">Price Subtitle (e.g. /month)</label><input type="text" name="price_subtitle" placeholder="e.g. per project" class="dash-input"></div>
+                        <div class="flex items-end pb-3">
                             <label class="flex items-center gap-3 cursor-pointer">
                                 <input type="checkbox" name="is_featured" value="1" class="w-4 h-4 rounded accent-primary">
                                 <span class="text-[10px] font-black uppercase tracking-widest" style="color: var(--muted-2)">Featured / Hot</span>
                             </label>
                         </div>
                     </div>
-                    <div><label class="field-label">Features (comma separated)</label><textarea name="features" placeholder="3D Model, 4K Render, Source Files..." class="dash-input h-20 resize-none" required></textarea></div>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                        <div><label class="field-label">Features (comma separated)</label><textarea name="features" placeholder="3D Model, 4K Render, Source Files..." class="dash-input h-20 resize-none" required></textarea></div>
+                        <div><label class="field-label">Benefits / Description</label><textarea name="benefits" placeholder="Details for clarification..." class="dash-input h-20 resize-none"></textarea></div>
+                    </div>
                     <button type="submit" class="btn-primary">Deploy Pricing Tier</button>
                 </form>
             </div>
@@ -902,12 +906,16 @@
                                 <input type="text" name="plan_name" value="{{ $tier->plan_name }}" class="dash-input" required>
                                 <input type="text" name="price" value="{{ $tier->price }}" class="dash-input" required>
                             </div>
-                            <div class="flex items-center gap-3 px-1">
-                                <input type="hidden" name="is_featured" value="0">
-                                <input type="checkbox" name="is_featured" value="1" @if($tier->is_featured) checked @endif class="w-4 h-4 rounded accent-primary">
-                                <span class="text-[10px] font-bold uppercase" style="color: var(--muted)">Featured</span>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" name="price_subtitle" value="{{ $tier->price_subtitle }}" class="dash-input" placeholder="Price Subtitle">
+                                <div class="flex items-center gap-3 px-1">
+                                    <input type="hidden" name="is_featured" value="0">
+                                    <input type="checkbox" name="is_featured" value="1" @if($tier->is_featured) checked @endif class="w-4 h-4 rounded accent-primary">
+                                    <span class="text-[10px] font-bold uppercase" style="color: var(--muted)">Featured</span>
+                                </div>
                             </div>
                             <textarea name="features" class="dash-input h-20 resize-none">{{ $tier->features }}</textarea>
+                            <div><label class="field-label">Benefits / Description</label><textarea name="benefits" class="dash-input h-20 resize-none">{{ $tier->benefits }}</textarea></div>
                             <button type="submit" class="btn-save">Update Tier</button>
                         </form>
                     </div>
