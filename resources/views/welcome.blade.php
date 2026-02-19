@@ -481,7 +481,7 @@
       <div class="flex-shrink-0 relative group">
         <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
         <div class="relative w-48 h-48 md:w-64 md:h-64 bg-gray-100 dark:bg-[#0A0A0A] rounded-xl overflow-hidden flex items-center justify-center">
-          <img alt="Pixel Art Portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClvKk01I6_8TrXQOClo3z_bkELeWbNvtucvWZFoCmMpWyI9S8q9-16stSmKgkxd5cqiEPl0OJCWSh9QC9BiJLMe52wlBadCu3-qkCIyu6r9hY7QVMAZJnLwXEp_pc6-XwyMRLWU-LK_Z9gaW6Nya1uYCFWsnARyy3_qtj_WVQGBj6EUwKcojg0GAhAeGr4O2Lqwo4sxfURyvu-_fQNTizcUezQ-Vn39zMO6hlegZvMCGCXb9tAK7aObAjS0qGCXRxGMybQuB984a3M"/>
+          <img alt="Pixel Art Portrait" class="w-full h-full object-cover" src="{{ $settings['about_image'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuClvKk01I6_8TrXQOClo3z_bkELeWbNvtucvWZFoCmMpWyI9S8q9-16stSmKgkxd5cqiEPl0OJCWSh9QC9BiJLMe52wlBadCu3-qkCIyu6r9hY7QVMAZJnLwXEp_pc6-XwyMRLWU-LK_Z9gaW6Nya1uYCFWsnARyy3_qtj_WVQGBj6EUwKcojg0GAhAeGr4O2Lqwo4sxfURyvu-_fQNTizcUezQ-Vn39zMO6hlegZvMCGCXb9tAK7aObAjS0qGCXRxGMybQuB984a3M' }}"/>
         </div>
       </div>
 
@@ -590,11 +590,11 @@
 
 <section class="py-20 bg-white dark:bg-black border-y border-black/5 dark:border-white/5" id="stats-section">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="flex flex-wrap justify-center gap-8">
       @foreach($stats as $stat)
-        <div class="text-center p-6 rounded-2xl stat-card">
+        <div class="text-center p-8 rounded-2xl stat-card w-full sm:w-[240px]">
           <div class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-2 stat-value" data-target="{{ preg_replace('/[^0-9]/', '', $stat->value) }}">{{ $stat->value }}</div>
-          <div class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-widest">{{ $stat->label }}</div>
+          <div class="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-widest leading-loose">{{ $stat->label }}</div>
         </div>
       @endforeach
     </div>
@@ -622,9 +622,9 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+    <div class="flex flex-wrap justify-center gap-8 items-stretch">
       @foreach($pricings as $index => $price)
-        <div class="relative h-full rounded-3xl p-8 flex flex-col transition-all duration-300 overflow-visible
+        <div class="relative w-full md:w-[380px] rounded-3xl p-8 flex flex-col transition-all duration-300 overflow-visible
                     {{ $price->is_featured ? 'pricing-card-featured' : 'pricing-card' }}">
 
           @if($price->is_featured)

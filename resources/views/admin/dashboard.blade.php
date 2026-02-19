@@ -971,7 +971,7 @@
             </div>
 
             <div class="dash-card p-8">
-                <form action="/admin/settings" method="POST" class="space-y-10">
+                <form action="/admin/settings" method="POST" enctype="multipart/form-data" class="space-y-10">
                     @csrf
 
                     <!-- Hero -->
@@ -995,11 +995,31 @@
                             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs">👤</div>
                             <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">Professional Bio</h4>
                         </div>
-                        <div class="grid lg:grid-cols-2 gap-5">
-                            <div><label class="field-label">About Label</label><input type="text" name="about_label" value="{{ $settings['about_label'] ?? 'THE STUDIO' }}" class="dash-input"></div>
-                            <div><label class="field-label">About Heading</label><input type="text" name="about_heading" value="{{ $settings['about_heading'] ?? 'Pure Form.' }}" class="dash-input"></div>
+                        <div class="grid lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-1">
+                                <label class="field-label">About Display Image</label>
+                                <div class="relative group">
+                                    <div class="w-full aspect-square rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
+                                        @if($settings['about_image'] ?? false)
+                                            <img src="{{ $settings['about_image'] }}" class="w-full h-full object-cover" id="about-preview">
+                                        @else
+                                            <span class="text-4xl opacity-20">🖼️</span>
+                                        @endif
+                                    </div>
+                                    <input type="file" name="about_image" id="about_image_input" class="hidden" accept="image/*" onchange="previewImage(this, 'about-preview')">
+                                    <button type="button" onclick="document.getElementById('about_image_input').click()" class="w-full py-3 bg-black/5 dark:bg-white/5 border border-dashed border-black/20 dark:border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-colors">
+                                        Upload Image
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 space-y-5">
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div><label class="field-label">About Label</label><input type="text" name="about_label" value="{{ $settings['about_label'] ?? 'THE STUDIO' }}" class="dash-input"></div>
+                                    <div><label class="field-label">About Heading</label><input type="text" name="about_heading" value="{{ $settings['about_heading'] ?? 'Pure Form.' }}" class="dash-input"></div>
+                                </div>
+                                <div><label class="field-label">Biography</label><textarea name="about_description" class="dash-input h-32 resize-none">{{ $settings['about_description'] ?? '' }}</textarea></div>
+                            </div>
                         </div>
-                        <div class="mt-5"><label class="field-label">Biography</label><textarea name="about_description" class="dash-input h-28">{{ $settings['about_description'] ?? '' }}</textarea></div>
                     </div>
 
                     <hr class="form-divider">
@@ -1157,6 +1177,25 @@
 
     // Init icon state on load
     syncThemeIcons();
+
+    // Image Preview Helper
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(previewId);
+                const container = preview.parentElement;
+                
+                // If the preview <img> doesn't exist yet (e.g., initial state), create it or find it
+                if (!preview && container) {
+                    container.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" id="${previewId}">`;
+                } else if (preview) {
+                    preview.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
 </body>
 </html>

@@ -103,9 +103,15 @@ class AdminController extends Controller
     // Settings (About)
     public function updateSettings(Request $request)
     {
-        foreach ($request->except('_token') as $key => $value) {
+        foreach ($request->except(['_token', 'about_image']) as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
+
+        if ($request->hasFile('about_image')) {
+            $path = $request->file('about_image')->store('about', 'public');
+            Setting::updateOrCreate(['key' => 'about_image'], ['value' => '/storage/' . $path]);
+        }
+
         return back()->with('success', 'Settings updated!');
     }
 
