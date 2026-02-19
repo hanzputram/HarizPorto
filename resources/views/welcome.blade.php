@@ -734,13 +734,27 @@
     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase mb-4">Start Render.</h2>
     <p class="text-gray-600 dark:text-gray-400 mb-12">Have a vision? Let's bring it into three dimensions.</p>
 
-    <form>
+    <div id="contact-success" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-fade-in">
+        <div class="px-6 py-3 bg-green-500 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-2xl shadow-green-500/20 flex items-center gap-3">
+            <i class="fa-solid fa-circle-check"></i>
+            Transmission received. I will get back to you soon!
+        </div>
+    </div>
+
+    <div id="contact-error" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-fade-in">
+        <div class="px-6 py-3 bg-red-500 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-2xl shadow-red-500/20 flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            Something went wrong. Please try again later.
+        </div>
+    </div>
+
+    <form id="contact-form" action="https://formspree.io/f/xbdakqzz" method="POST">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="group">
           <label class="block text-[10px] font-black text-gray-500 uppercase mb-3 tracking-[0.2em]" for="name">Your Name</label>
           <div class="relative">
             <input class="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 py-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-600 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-                   id="name" placeholder="John Doe" type="text"/>
+                   id="name" name="name" placeholder="John Doe" type="text" required/>
             <div class="absolute bottom-0 left-6 right-6 h-0.5 bg-gradient-to-r from-primary to-secondary scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500 origin-left"></div>
           </div>
         </div>
@@ -749,7 +763,7 @@
           <label class="block text-[10px] font-black text-gray-500 uppercase mb-3 tracking-[0.2em]" for="email">Your Email</label>
           <div class="relative">
             <input class="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 py-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-600 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-                   id="email" placeholder="john@example.com" type="email"/>
+                   id="email" name="_replyto" placeholder="john@example.com" type="email" required/>
             <div class="absolute bottom-0 left-6 right-6 h-0.5 bg-gradient-to-r from-primary to-secondary scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500 origin-left"></div>
           </div>
         </div>
@@ -759,17 +773,55 @@
         <label class="block text-[10px] font-black text-gray-500 uppercase mb-3 tracking-[0.2em]" for="message">Project Vision</label>
         <div class="relative">
           <textarea class="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 py-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-600 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none resize-none"
-                    id="message" placeholder="What are we building?" rows="5"></textarea>
+                    id="message" name="message" placeholder="What are we building?" rows="5" required></textarea>
           <div class="absolute bottom-0 left-6 right-6 h-0.5 bg-gradient-to-r from-primary to-secondary scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500 origin-left"></div>
         </div>
       </div>
 
-      <button class="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-xs hover:opacity-90 transition-all rounded-2xl mt-8 group relative overflow-hidden shadow-2xl shadow-black/5"
+      <button id="contact-submit" class="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-xs hover:opacity-90 transition-all rounded-2xl mt-8 group relative overflow-hidden shadow-2xl shadow-black/5"
               type="submit">
         <span class="relative z-10">Send Transmission <i class="fa-solid fa-paper-plane ml-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i></span>
       </button>
     </form>
 
+    <script>
+      const contactForm = document.getElementById('contact-form');
+      const contactSubmit = document.getElementById('contact-submit');
+      const successMsg = document.getElementById('contact-success');
+      const errorMsg = document.getElementById('contact-error');
+
+      if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          contactSubmit.disabled = true;
+          contactSubmit.innerHTML = 'Sending...';
+
+          try {
+            const formData = new FormData(contactForm);
+            const response = await fetch(contactForm.action, {
+              method: 'POST',
+              body: formData,
+              headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+              successMsg.classList.remove('hidden');
+              contactForm.reset();
+              setTimeout(() => successMsg.classList.add('hidden'), 5000);
+            } else {
+              errorMsg.classList.remove('hidden');
+              setTimeout(() => errorMsg.classList.add('hidden'), 5000);
+            }
+          } catch (error) {
+            errorMsg.classList.remove('hidden');
+            setTimeout(() => errorMsg.classList.add('hidden'), 5000);
+          } finally {
+            contactSubmit.disabled = false;
+            contactSubmit.innerHTML = 'Send Transmission <i class="fa-solid fa-paper-plane ml-3"></i>';
+          }
+        });
+      }
+    </script>
     <div class="mt-20 pt-12 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row justify-between items-center">
       <div class="text-center md:text-left mb-8 md:mb-0">
         <div class="font-black text-gray-900 dark:text-white text-xl uppercase tracking-tighter">Hariz Fauzil A.</div>

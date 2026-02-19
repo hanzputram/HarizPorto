@@ -10,6 +10,7 @@ use App\Models\Faq;
 use App\Models\Stat;
 use App\Models\Workflow;
 use App\Models\Capability;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -24,6 +25,8 @@ Route::get('/', function () {
     $settings = Setting::pluck('value', 'key');
     return view('welcome', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities'));
 });
+
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/portfolio', function () {
     $portfolios = Portfolio::latest()->get();
