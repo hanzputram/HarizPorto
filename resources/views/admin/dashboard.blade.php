@@ -865,7 +865,7 @@
                     </div>
                     <div class="grid sm:grid-cols-2 gap-5">
                         <div><label class="field-label">Features (comma separated)</label><textarea name="features" placeholder="3D Model, 4K Render, Source Files..." class="dash-input h-20 resize-none" required></textarea></div>
-                        <div><label class="field-label">Benefits / Description</label><textarea name="benefits" placeholder="Details for clarification..." class="dash-input h-20 resize-none"></textarea></div>
+                        <div><label class="field-label">Description</label><textarea name="benefits" placeholder="Details for clarification..." class="dash-input h-20 resize-none"></textarea></div>
                     </div>
                     <button type="submit" class="btn-primary">Deploy Pricing Tier</button>
                 </form>
@@ -914,8 +914,8 @@
                                     <span class="text-[10px] font-bold uppercase" style="color: var(--muted)">Featured</span>
                                 </div>
                             </div>
-                            <textarea name="features" class="dash-input h-20 resize-none">{{ $tier->features }}</textarea>
-                            <div><label class="field-label">Benefits / Description</label><textarea name="benefits" class="dash-input h-20 resize-none">{{ $tier->benefits }}</textarea></div>
+                            <label class="field-label">Benefits</label><textarea name="features" class="dash-input h-20 resize-none">{{ $tier->features }}</textarea>
+                            <div><label class="field-label">Description</label><textarea name="benefits" class="dash-input h-20 resize-none">{{ $tier->benefits }}</textarea></div>
                             <button type="submit" class="btn-save">Update Tier</button>
                         </form>
                     </div>
