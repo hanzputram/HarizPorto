@@ -77,19 +77,20 @@
 
             --divider: rgba(0,0,0,0.08);
 
-            /* Sidebar (Light mode colors now) */
-            --sidebar-bg: #ffffff;
+            /* Sidebar (Light mode) */
+            --sidebar-bg: rgba(255, 255, 255, 0.95);
             --sidebar-divider: rgba(0,0,0,0.06);
-            --sidebar-link: rgba(0,0,0,0.55);
-            --sidebar-link-hover-bg: rgba(0,0,0,0.04);
-            --sidebar-link-hover: #111111;
-            --sidebar-heading: rgba(0,0,0,0.35);
-            --sidebar-sub: rgba(0,0,0,0.45);
-            --sidebar-icon-bg: rgba(0,0,0,0.03);
+            --sidebar-link: rgba(0,0,0,0.5);
+            --sidebar-link-hover-bg: rgba(217,70,239,0.06);
+            --sidebar-link-hover: #D946EF;
+            --sidebar-logo: #111111;
+            --sidebar-heading: rgba(0,0,0,0.4);
+            --sidebar-sub: rgba(0,0,0,0.5);
+            --sidebar-icon-bg: rgba(0,0,0,0.04);
 
             /* Scrollbar */
-            --scroll-thumb: rgba(0,0,0,0.15);
-            --scroll-thumb-hover: rgba(0,0,0,0.25);
+            --scroll-thumb: #E2E8F0;
+            --scroll-thumb-hover: #CBD5E1;
             --scroll-track: transparent;
         }
 
@@ -127,19 +128,20 @@
 
             --divider: rgba(255,255,255,0.14);
 
-            /* Sidebar (Dark mode overrides) */
-            --sidebar-bg: #07070a;
+            /* Sidebar (Dark mode) */
+            --sidebar-bg: #050508;
             --sidebar-divider: rgba(255,255,255,0.08);
-            --sidebar-link: rgba(255,255,255,0.55);
-            --sidebar-link-hover-bg: rgba(255,255,255,0.10);
+            --sidebar-link: rgba(255,255,255,0.5);
+            --sidebar-link-hover-bg: rgba(255,255,255,0.06);
             --sidebar-link-hover: #ffffff;
-            --sidebar-heading: rgba(255,255,255,0.28);
-            --sidebar-sub: rgba(255,255,255,0.36);
-            --sidebar-icon-bg: rgba(255,255,255,0.07);
+            --sidebar-logo: #ffffff;
+            --sidebar-heading: rgba(255,255,255,0.3);
+            --sidebar-sub: rgba(255,255,255,0.4);
+            --sidebar-icon-bg: rgba(255,255,255,0.06);
 
-            --scroll-thumb: rgba(217,70,239,0.35);
-            --scroll-thumb-hover: rgba(217,70,239,0.5);
-            --scroll-track: rgba(255,255,255,0.02);
+            --scroll-thumb: rgba(255,255,255,0.1);
+            --scroll-thumb-hover: #D946EF;
+            --scroll-track: rgba(0,0,0,0.2);
 
             /* Deep Dark Inputs */
             --input-bg: #040406;
@@ -162,14 +164,25 @@
         ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
-        /* Specific Sidebar Scrollbar */
-        #sidebar nav::-webkit-scrollbar { width: 4px; }
-        #sidebar nav::-webkit-scrollbar-thumb { background: var(--sidebar-divider); border-radius: 10px; }
-        #sidebar nav::-webkit-scrollbar-thumb:hover { background: var(--sidebar-link); }
+        /* Sidebar Scrollbar - Vibrant Gradient */
+        #sidebar nav::-webkit-scrollbar { width: 6px; }
+        #sidebar nav::-webkit-scrollbar-track { background: var(--scroll-track); }
+        #sidebar nav::-webkit-scrollbar-thumb { 
+            background: linear-gradient(to bottom, #D946EF, #06B6D4) !important; 
+            border-radius: 20px;
+        }
+        #sidebar nav::-webkit-scrollbar-thumb:hover { 
+            background: #D946EF !important; 
+        }
+        
+        /* Firefox */
+        #sidebar nav { scrollbar-width: thin; scrollbar-color: #D946EF transparent; }
 
         /* Sidebar */
         .sidebar {
-            background: var(--sidebar-bg) !important; /* ✅ force follow theme */
+            background: var(--sidebar-bg) !important;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
         .sidebar-link {
             display: flex; align-items: center; gap: 12px;
@@ -365,10 +378,10 @@
 <body>
 
 <!-- Mobile Header -->
-<div class="md:hidden mobile-header p-4 sticky top-0 z-60 flex items-center justify-between">
+<div class="md:hidden mobile-header p-4 sticky top-0 z-60 flex items-center justify-between backdrop-blur-lg">
     <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-black">H</div>
-        <span class="font-black text-xs uppercase tracking-widest text-white">HARIZ.<span class="text-gradient">STUDIO</span></span>
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-black shadow-lg shadow-primary/20">H</div>
+        <span class="font-black text-xs uppercase tracking-widest" style="color: var(--sidebar-logo)">HARIZ.<span class="text-gradient">STUDIO</span></span>
     </div>
 
     <div class="flex items-center gap-2">
@@ -390,9 +403,9 @@
 <aside id="sidebar" class="sidebar w-64 flex flex-col fixed inset-y-0 left-0 z-50 transition-all duration-300 -translate-x-full md:translate-x-0">
     <!-- Logo -->
     <div class="px-6 py-8 flex items-center gap-3 border-b" style="border-color: var(--sidebar-divider)">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-sm shadow-lg shadow-primary/30">H</div>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-sm shadow-lg shadow-primary/20">H</div>
         <div>
-            <div class="font-black text-xs uppercase tracking-widest leading-none text-main md:text-white" style="color: var(--sidebar-link-hover)">HARIZ.</div>
+            <div class="font-black text-xs uppercase tracking-widest leading-none" style="color: var(--sidebar-logo)">HARIZ.</div>
             <div class="text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5" style="color: var(--sidebar-sub)">Admin Panel</div>
         </div>
     </div>
