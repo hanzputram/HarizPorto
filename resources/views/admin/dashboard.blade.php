@@ -445,6 +445,14 @@
         <a href="#social-media" class="sidebar-link">
             <span class="icon">🔗</span> Social Links
         </a>
+
+        <p class="px-3 text-[9px] font-black uppercase tracking-[0.2em] mb-3 mt-6" style="color: var(--sidebar-heading)">Maintenance</p>
+        <a href="/admin/tools/storage-link" class="sidebar-link" target="_blank">
+            <span class="icon">🔗</span> Storage Link
+        </a>
+        <a href="/admin/tools/clear-cache" class="sidebar-link" target="_blank">
+            <span class="icon">🧹</span> Clear Cache
+        </a>
     </nav>
 
     <div class="px-4 py-6 border-t" style="border-color: var(--sidebar-divider)">
@@ -864,8 +872,8 @@
                         </div>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-5">
-                        <div><label class="field-label">Features (comma separated)</label><textarea name="features" placeholder="3D Model, 4K Render, Source Files..." class="dash-input h-20 resize-none" required></textarea></div>
-                        <div><label class="field-label">Description</label><textarea name="benefits" placeholder="Details for clarification..." class="dash-input h-20 resize-none"></textarea></div>
+                        <div><label class="field-label">Benefits List (comma/new line)</label><textarea name="features" placeholder="3D Model, 4K Render, Source Files..." class="dash-input h-20 resize-none" required></textarea></div>
+                        <div><label class="field-label">Tier Description (optional)</label><textarea name="benefits" placeholder="Details for clarification..." class="dash-input h-20 resize-none"></textarea></div>
                     </div>
                     <button type="submit" class="btn-primary">Deploy Pricing Tier</button>
                 </form>
@@ -914,8 +922,10 @@
                                     <span class="text-[10px] font-bold uppercase" style="color: var(--muted)">Featured</span>
                                 </div>
                             </div>
-                            <label class="field-label">Benefits</label><textarea name="features" class="dash-input h-20 resize-none">{{ $tier->features }}</textarea>
-                            <div><label class="field-label">Description</label><textarea name="benefits" class="dash-input h-20 resize-none">{{ $tier->benefits }}</textarea></div>
+                            <div class="grid sm:grid-cols-2 gap-5">
+                                <div><label class="field-label">Benefits List</label><textarea name="features" class="dash-input h-20 resize-none">{{ $tier->features }}</textarea></div>
+                                <div><label class="field-label">Tier Description</label><textarea name="benefits" class="dash-input h-20 resize-none">{{ $tier->benefits }}</textarea></div>
+                            </div>
                             <button type="submit" class="btn-save">Update Tier</button>
                         </form>
                     </div>

@@ -26,6 +26,38 @@ Route::get('/', function () {
     return view('welcome', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities'));
 });
 
+// Production Maintenance - Tools for shared hosting
+Route::middleware('auth')->prefix('admin/tools')->group(function () {
+    Route::get('/storage-link', function () {
+        try {
+            // Support both /public and /public_html
+            $publicPath = public_path('storage');
+            if (file_exists($publicPath)) {
+                return "The 'storage' link already exists. If images are broken, delete 'public_html/storage' manually first.";
+            }
+            \Illuminate\Support\Facades\Artisan::call('storage:link');
+            return "Storage link created successfully via Artisan.";
+        } catch (\Exception $e) {
+            // Manual fallback for some restricted environments
+            try {
+                $target = storage_path('app/public');
+                symlink($target, public_path('storage'));
+                return "Storage link created successfully via symlink fallback.";
+            } catch (\Exception $e2) {
+                return "Failed! Error: " . $e2->getMessage();
+            }
+        }
+    })->name('admin.tools.storage');
+
+    Route::get('/clear-cache', function () {
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        return "All caches cleared successfully!";
+    })->name('admin.tools.cache');
+});
+
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/portfolio', function () {
