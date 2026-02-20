@@ -151,7 +151,7 @@
         <div class="group cursor-pointer">
             <a href="{{ $work->project_url ?? '#' }}" target="_blank" class="block rounded-3xl overflow-hidden border border-white/10 relative aspect-square md:aspect-[4/5] bg-surface-card transition-all duration-300 card-hover">
                 @if($work->image_url)
-                <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
+                <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-80 group-hover:opacity-100" src="{{ str_starts_with($work->image_url, 'http') ? $work->image_url : asset($work->image_url) }}"/>
                 @else
                 <div class="w-full h-full flex items-center justify-center text-6xl opacity-10">🧊</div>
                 @endif

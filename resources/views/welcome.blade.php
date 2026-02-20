@@ -524,7 +524,7 @@
         <div class="group cursor-pointer">
           <a href="{{ $work->project_url ?? '#' }}" target="_blank" class="block rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 relative h-64 md:h-80 bg-white dark:bg-surface-card">
             @if($work->image_url)
-              <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-90 dark:opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
+              <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-90 dark:opacity-80 group-hover:opacity-100" src="{{ str_starts_with($work->image_url, 'http') ? $work->image_url : asset($work->image_url) }}"/>
             @else
               <div class="w-full h-full flex items-center justify-center text-6xl opacity-10">🧊</div>
             @endif

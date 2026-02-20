@@ -54,7 +54,7 @@ class AdminController extends Controller
                 mkdir($targetPath, 0755, true);
             }
             $file->move($targetPath, $filename);
-            $data['image_url'] = 'uploads/portfolios/' . $filename;
+            $data['image_url'] = 'storage/portfolios/' . $filename;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com')) {
             $originalUrl = $request->image_url;
             $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
@@ -91,7 +91,7 @@ class AdminController extends Controller
                 mkdir($targetPath, 0755, true);
             }
             $file->move($targetPath, $filename);
-            $data['image_url'] = 'uploads/portfolios/' . $filename;
+            $data['image_url'] = 'storage/portfolios/' . $filename;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com') && $request->image_url !== $portfolio->image_url) {
             $originalUrl = $request->image_url;
             $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
@@ -152,9 +152,8 @@ class AdminController extends Controller
 
                 $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
                 
-                // Match the user's manual folder structure
-                $publicFolder = 'storage/about';
-                $targetPath = public_path($publicFolder);
+                // Save directly to public/uploads/about
+                $targetPath = public_path('uploads/about');
 
                 if (!file_exists($targetPath)) {
                     mkdir($targetPath, 0755, true);
@@ -163,11 +162,11 @@ class AdminController extends Controller
                 try {
                     $file->move($targetPath, $filename);
                 } catch (\Exception $e) {
-                    return back()->with('error', 'Upload failed! Folder "public/storage/about" might be locked. Error: ' . $e->getMessage());
+                    return back()->with('error', 'Upload failed! Folder "public/uploads/about" might be locked. Error: ' . $e->getMessage());
                 }
 
-                // Save path for asset() helper
-                Setting::updateOrCreate(['key' => 'about_image'], ['value' => $publicFolder . '/' . $filename]);
+                // Save path for asset() helper (will be rewritten to uploads/ via .htaccess)
+                Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/about/' . $filename]);
             }
 
             // 3. Clean up database slashes

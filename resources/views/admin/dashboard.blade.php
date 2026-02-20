@@ -607,7 +607,7 @@
                         <div class="dash-card p-5 group relative overflow-hidden">
                             <div class="relative h-44 rounded-xl overflow-hidden mb-4" style="background: rgba(255,255,255,0.06);">
                                 @if($item->image_url)
-                                    <img src="{{ $item->image_url }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:blur-[2px]">
+                                    <img src="{{ str_starts_with($item->image_url, 'http') ? $item->image_url : asset($item->image_url) }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:blur-[2px]">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-4xl opacity-10">🧊</div>
                                 @endif
@@ -1177,7 +1177,7 @@
 
 
                     <button type="submit" class="btn-gradient">Update Global Settings ✦</button>
-                </form>sd
+                </form>
             </div>
         </section>
 
