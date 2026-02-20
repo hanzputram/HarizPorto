@@ -524,12 +524,34 @@
     <main class="p-6 md:p-10 max-w-screen-xl mx-auto">
 
         @if(session('success'))
-        <div class="mb-8 p-5 rounded-2xl flex items-center gap-4"
+        <div class="mb-8 p-5 rounded-2xl flex items-center gap-4 animate-fade-in"
              style="background: rgba(34,197,94,0.10); border: 1px solid rgba(34,197,94,0.25);">
             <span class="w-9 h-9 rounded-xl bg-green-500 text-white flex items-center justify-center text-sm shadow-lg shadow-green-500/20">✓</span>
             <div>
                 <p class="text-[9px] font-black uppercase tracking-widest" style="color: rgba(34,197,94,0.70);">Success</p>
                 <p class="text-sm font-bold" style="color: rgba(34,197,94,0.95);">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('error') || $errors->any())
+        <div class="mb-8 p-5 rounded-2xl flex items-center gap-4 animate-fade-in"
+             style="background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.25);">
+            <span class="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center text-sm shadow-lg shadow-red-500/20">!</span>
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-widest" style="color: rgba(239,68,68,0.70);">Error Detection</p>
+                <p class="text-sm font-bold" style="color: rgba(239,68,68,0.95);">
+                    @if(session('error'))
+                        {{ session('error') }}
+                    @else
+                        Please check the fields below.
+                        <ul class="text-[10px] mt-1 opacity-80">
+                            @foreach($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </p>
             </div>
         </div>
         @endif

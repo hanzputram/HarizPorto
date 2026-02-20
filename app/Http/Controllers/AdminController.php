@@ -124,22 +124,44 @@ class AdminController extends Controller
     // Settings (About)
     public function updateSettings(Request $request)
     {
-        foreach ($request->except(['_token', 'about_image']) as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-        }
+        try {
+            foreach ($request->except(['_token', '_method', 'about_image']) as $key => $value) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            }
 
-        if ($request->hasFile('about_image')) {
-            $path = $request->file('about_image')->store('about', 'public');
-            Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/' . $path]);
-        }
+            if ($request->hasFile('about_image')) {
+                $request->validate([
+                    'about_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Increased to 5MB
+                ]);
 
-        // Auto-sanitize existing paths with leading slashes if they were just saved
-        $aboutImage = Setting::where('key', 'about_image')->first();
-        if ($aboutImage && str_starts_with($aboutImage->value, '/')) {
-            $aboutImage->update(['value' => ltrim($aboutImage->value, '/')]);
-        }
+                $file = $request->file('about_image');
+                $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
+                
+                // Ensure directory exists
+                $targetDir = storage_path('app/public/about');
+                if (!file_exists($targetDir)) {
+                    mkdir($targetDir, 0755, true);
+                }
 
-        return back()->with('success', 'Settings updated!');
+                $path = $file->storeAs('about', $filename, 'public');
+                
+                if ($path) {
+                    Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/' . $path]);
+                } else {
+                    return back()->with('error', 'Critical: File saved to memory but failed to write to disk. Check directory permissions.');
+                }
+            }
+
+            // Auto-sanitize existing paths
+            $aboutImage = Setting::where('key', 'about_image')->first();
+            if ($aboutImage && str_starts_with($aboutImage->value, '/')) {
+                $aboutImage->update(['value' => ltrim($aboutImage->value, '/')]);
+            }
+
+            return back()->with('success', 'Settings updated successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error updating settings: ' . $e->getMessage());
+        }
     }
 
     // Reviews
