@@ -550,10 +550,10 @@
                             <label class="field-label">Image URL / IconScout</label>
                             <div class="relative group/input">
                                 <input type="text" name="image_url" id="portfolio_image_url" placeholder="Paste link from IconScout..." class="dash-input pr-28">
-                                <button type="button" onclick="verifyIconLink('portfolio_image_url')" 
+                                <!-- <button type="button" onclick="verifyIconLink('portfolio_image_url')" 
                                         class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
                                     Verify Link ✦
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                         <div><label class="field-label">Project URL</label><input type="text" name="project_url" placeholder="https://..." class="dash-input"></div>
