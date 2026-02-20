@@ -337,20 +337,39 @@ class AdminController extends Controller
     private function uploadIconScoutImage($url)
     {
         try {
+            // 1. Get the direct image URL using our pattern/detector
             $response = $this->fetchMetadata(new Request(['url' => $url]));
-            $data = $response->getData();
-            if (isset($data->success) && $data->success) {
-                $imageUrl = $data->image_url;
-                $imageContents = file_get_contents($imageUrl);
-                if ($imageContents) {
-                    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
-                    $filename = 'icon_' . Str::random(10) . '.' . $ext;
+            $data = json_decode($response->getContent(), true);
+
+            if (isset($data['success']) && $data['success']) {
+                $imageUrl = $data['image_url'];
+                
+                // 2. Download using cURL (More reliable on production servers than file_get_contents)
+                $ch = curl_init($imageUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                $imageContents = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($imageContents && $httpCode === 200) {
+                    // Determine extension (default to jpg for iconscout previews)
+                    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                    if (str_contains($imageUrl, 'cdn3d')) $ext = 'jpg';
+                    
+                    $filename = 'icon_' . time() . '_' . Str::random(5) . '.' . $ext;
                     $path = 'portfolios/' . $filename;
+                    
                     Storage::disk('public')->put($path, $imageContents);
                     return '/storage/' . $path;
                 }
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("IconScout Auto-Fetch Error: " . $e->getMessage());
+        }
         return null;
     }
 }
