@@ -32,10 +32,14 @@ Route::middleware('auth')->prefix('admin/tools')->group(function () {
     Route::get('/storage-link', function () {
         try {
             $publicPath = public_path('storage');
+            $uploadPath = public_path('content_uploads');
             
-            // Check if user wants a force repair (common for 404 issues)
+            // diagnostic
+            $status = "Diagnostic:\n";
+            $status .= "Public Path: " . public_path() . "\n";
+            $status .= "Uploads Folder Writable: " . (is_writable(public_path()) ? 'YES' : 'NO') . "\n";
+            
             if (file_exists($publicPath) || is_link($publicPath)) {
-                // Try to delete existing link/file to allow clean recreation
                 if (PHP_OS_FAMILY === 'Windows') {
                     is_dir($publicPath) ? rmdir($publicPath) : unlink($publicPath);
                 } else {
@@ -44,9 +48,9 @@ Route::middleware('auth')->prefix('admin/tools')->group(function () {
             }
             
             \Illuminate\Support\Facades\Artisan::call('storage:link');
-            return "Storage link repaired and recreated successfully. Check if images are working now.";
+            return nl2br($status . "Storage link repaired. Check images now.");
         } catch (\Exception $e) {
-            return "Failed to repair link! Error: " . $e->getMessage() . ". Please delete 'public/storage' manually via File Manager.";
+            return "Failed to repair link! Error: " . $e->getMessage();
         }
     })->name('admin.tools.storage');
 
