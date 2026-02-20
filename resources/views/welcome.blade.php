@@ -768,7 +768,8 @@
         </div>
     </div>
 
-    <form id="contact-form" action="https://formspree.io/f/xbdakqzz" method="POST">
+    <form id="contact-form" action="{{ route('contact.send') }}" method="POST">
+      @csrf
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="group">
           <label class="block text-[10px] font-black text-gray-500 uppercase mb-3 tracking-[0.2em]" for="name">Your Name</label>

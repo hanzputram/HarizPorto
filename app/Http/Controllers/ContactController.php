@@ -18,8 +18,17 @@ class ContactController extends Controller
 
         try {
             Mail::to('harizadhim760@gmail.com')->send(new ContactFormMail($validated));
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Transmission received. I will get back to you soon!']);
+            }
+            
             return back()->with('success', 'Transmission received. I will get back to you soon!');
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Something went wrong. Please try again later.'], 500);
+            }
+            
             return back()->with('error', 'Something went wrong. Please try again later.');
         }
     }

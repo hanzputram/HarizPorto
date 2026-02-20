@@ -447,12 +447,12 @@
         </a>
 
         <p class="px-3 text-[9px] font-black uppercase tracking-[0.2em] mb-3 mt-6" style="color: var(--sidebar-heading)">Maintenance</p>
-        <a href="/admin/tools/storage-link" class="sidebar-link" target="_blank">
+        <button onclick="runMaintenance('{{ route('admin.tools.storage') }}', this)" class="w-full sidebar-link text-left">
             <span class="icon">🔗</span> Storage Link
-        </a>
-        <a href="/admin/tools/clear-cache" class="sidebar-link" target="_blank">
+        </button>
+        <button onclick="runMaintenance('{{ route('admin.tools.cache') }}', this)" class="w-full sidebar-link text-left">
             <span class="icon">🧹</span> Clear Cache
-        </a>
+        </button>
     </nav>
 
     <div class="px-4 py-6 border-t" style="border-color: var(--sidebar-divider)">
@@ -478,11 +478,24 @@
 
     <!-- Top Bar -->
     <header class="sticky top-0 z-30 backdrop-blur-md px-8 py-4 flex items-center justify-between topbar">
-        <div>
-            <h1 class="text-lg font-black tracking-tight text-main">Dashboard Hub</h1>
-            <div class="flex items-center gap-2 mt-0.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-muted">System Operational</span>
+        <div class="flex items-center">
+            <div>
+                <h1 class="text-lg font-black tracking-tight text-main">Dashboard Hub</h1>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-muted">System Operational</span>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-8 ml-12 border-l border-white/5 pl-8">
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-muted opacity-60">Database</span>
+                    <span class="text-xs font-black text-main uppercase">{{ count($portfolios) }} Works</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] text-muted opacity-60">Engagement</span>
+                    <span class="text-xs font-black text-main uppercase">{{ count($reviews) }} Reviews</span>
+                </div>
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -550,10 +563,10 @@
                             <label class="field-label">Image URL / IconScout</label>
                             <div class="relative group/input">
                                 <input type="text" name="image_url" id="portfolio_image_url" placeholder="Paste link from IconScout..." class="dash-input pr-28">
-                                <!-- <button type="button" onclick="verifyIconLink('portfolio_image_url')" 
+                                <button type="button" onclick="verifyIconLink('portfolio_image_url')" 
                                         class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
                                     Verify Link ✦
-                                </button> -->
+                                </button>
                             </div>
                         </div>
                         <div><label class="field-label">Project URL</label><input type="text" name="project_url" placeholder="https://..." class="dash-input"></div>
@@ -569,7 +582,7 @@
                         <div class="dash-card p-5 group relative overflow-hidden">
                             <div class="relative h-44 rounded-xl overflow-hidden mb-4" style="background: rgba(255,255,255,0.06);">
                                 @if($item->image_url)
-                                    <img src="{{ $item->image_url }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                    <img src="{{ $item->image_url }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:blur-[2px]">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-4xl opacity-10">🧊</div>
                                 @endif
@@ -593,12 +606,13 @@
                                     @csrf @method('PUT')
                                     <label class="field-label">Visual Title</label><input type="text" name="title" value="{{ $item->title }}" class="dash-input" required>
                                     <label class="field-label">Category</label><input type="text" name="category" value="{{ $item->category }}" class="dash-input" required>
+                                    <label class="field-label">Image URL / IconScout</label>
                                     <div class="relative group/input">
-                                        <label class="field-label">Image URL / IconScout</label><input type="text" name="image_url" id="edit_image_url_{{ $item->id }}" value="{{ $item->image_url }}" class="dash-input pr-28" placeholder="Image URL">
-                                        <!-- <button type="button" onclick="verifyIconLink('edit_image_url_{{ $item->id }}')" 
+                                        <input type="text" name="image_url" id="edit_image_url_{{ $item->id }}" value="{{ $item->image_url }}" class="dash-input pr-28" placeholder="Image URL">
+                                        <button type="button" onclick="verifyIconLink('edit_image_url_{{ $item->id }}')" 
                                                 class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
                                             Verify ✦
-                                        </button> -->
+                                        </button>
                                     </div>
                                     <label class="field-label">Project URL</label><input type="text" name="project_url" value="{{ $item->project_url }}" class="dash-input" placeholder="Project Link">
                                     <button type="submit" class="btn-save">Update Project</button>
@@ -1020,14 +1034,18 @@
                 <form action="/admin/settings" method="POST" enctype="multipart/form-data" class="space-y-10">
                     @csrf
 
-                    <!-- Hero -->
+                    <!-- Hero & SEO -->
                     <div>
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs">✨</div>
-                            <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">Hero Identity</h4>
+                            <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">Hero & SEO Identity</h4>
+                        </div>
+                        <div class="grid lg:grid-cols-2 gap-5 mb-5">
+                            <div><label class="field-label">Global Site Title</label><input type="text" name="site_title" value="{{ $settings['site_title'] ?? 'Hariz Fauzil A.' }}" class="dash-input" placeholder="e.g. Hariz Studio"></div>
+                            <div><label class="field-label">Meta Description</label><input type="text" name="site_description" value="{{ $settings['site_description'] ?? '' }}" class="dash-input" placeholder="SEO Description..."></div>
                         </div>
                         <div class="grid lg:grid-cols-2 gap-5">
-                            <div><label class="field-label">Tagline</label><input type="text" name="hero_tagline" value="{{ $settings['hero_tagline'] ?? '3D Artist & Designer' }}" class="dash-input"></div>
+                            <div><label class="field-label">Hero Tagline</label><input type="text" name="hero_tagline" value="{{ $settings['hero_tagline'] ?? '3D Artist & Designer' }}" class="dash-input"></div>
                             <div><label class="field-label">Hero Title</label><input type="text" name="hero_title" value="{{ $settings['hero_title'] ?? 'Digital Architect.' }}" class="dash-input"></div>
                         </div>
                         <div class="mt-5"><label class="field-label">Hero Description</label><textarea name="hero_description" class="dash-input h-24 resize-none">{{ $settings['hero_description'] ?? '' }}</textarea></div>
@@ -1314,6 +1332,38 @@
             }
         }
         return true; // Continue with form submission
+    }
+
+    // Maintenance AJAX Robot
+    async function runMaintenance(url, btn) {
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="icon animate-spin">⏳</span> Running...`;
+        
+        try {
+            const response = await fetch(url);
+            const text = await response.text();
+            
+            // Simple toast/alert for feedback
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-10 right-10 bg-black text-white px-6 py-3 rounded-xl border border-white/10 shadow-2xl z-[100] animate-fade-in text-[10px] font-black uppercase tracking-widest';
+            toast.innerHTML = `<span class="text-green-400 mr-2">✓</span> ${text}`;
+            document.body.appendChild(toast);
+            
+            btn.innerHTML = `<span class="icon">✅</span> Done`;
+            
+            setTimeout(() => {
+                toast.remove();
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 3000);
+        } catch (error) {
+            btn.innerHTML = `<span class="icon">❌</span> Failed`;
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 3000);
+        }
     }
 </script>
 </body>
