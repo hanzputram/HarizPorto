@@ -146,42 +146,39 @@ class AdminController extends Controller
             if ($request->hasFile('about_image')) {
                 $file = $request->file('about_image');
                 
-                // Validate
                 if (!$file->isValid()) {
-                    return back()->with('error', 'The uploaded file is not valid. Try another image.');
+                    return back()->with('error', 'The uploaded file is not valid.');
                 }
 
-                $filename = 'about_me_' . time() . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
                 
-                // We use a dedicated folder in public to avoid ANY symlink/storage permission drama
-                $publicFolder = 'content_uploads';
+                // Match the user's manual folder structure
+                $publicFolder = 'storage/about';
                 $targetPath = public_path($publicFolder);
 
-                // Brute force directory creation
                 if (!file_exists($targetPath)) {
-                    mkdir($targetPath, 0777, true);
+                    mkdir($targetPath, 0755, true);
                 }
                 
-                // Move file
                 try {
                     $file->move($targetPath, $filename);
                 } catch (\Exception $e) {
-                    return back()->with('error', 'Server refused to move the file! Path: ' . $targetPath . '. Error: ' . $e->getMessage());
+                    return back()->with('error', 'Upload failed! Folder "public/storage/about" might be locked. Error: ' . $e->getMessage());
                 }
 
-                // Save simple relative path
+                // Save path for asset() helper
                 Setting::updateOrCreate(['key' => 'about_image'], ['value' => $publicFolder . '/' . $filename]);
             }
 
-            // 3. Clean up database from previous failed attempts (leading slashes)
+            // 3. Clean up database slashes
             $aboutImage = Setting::where('key', 'about_image')->first();
             if ($aboutImage && str_starts_with($aboutImage->value, '/')) {
                 $aboutImage->update(['value' => ltrim($aboutImage->value, '/')]);
             }
 
-            return back()->with('success', 'Full system state updated! Your bio information is saved.');
+            return back()->with('success', 'Full system state updated! Bio information is saved.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Critical System Failure: ' . $e->getMessage());
+            return back()->with('error', 'Failure: ' . $e->getMessage());
         }
     }
 
