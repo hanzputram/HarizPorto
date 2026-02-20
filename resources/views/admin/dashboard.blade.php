@@ -1177,7 +1177,7 @@
 
 
                     <button type="submit" class="btn-gradient">Update Global Settings ✦</button>
-                </form>
+                </form>sd
             </div>
         </section>
 
