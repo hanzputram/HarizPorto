@@ -535,7 +535,7 @@
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs">✦</div>
                         <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">New Creation</h4>
                     </div>
-                    <form action="/admin/portfolio" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form action="/admin/portfolio" method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="handleIconScoutSubmit(this)">
                         @csrf
                         <div><label class="field-label">Visual Title</label><input type="text" name="title" placeholder="e.g. Neon City Scene" class="dash-input" required></div>
                         <div><label class="field-label">Category / Style</label><input type="text" name="category" placeholder="e.g. Environment" class="dash-input" required></div>
@@ -546,7 +546,16 @@
                             <input type="file" name="image" class="dash-file-input">
                         </div>
 
-                        <div><label class="field-label">Image URL (optional)</label><input type="text" name="image_url" placeholder="https://..." class="dash-input"></div>
+                        <div>
+                            <label class="field-label">Image URL / IconScout</label>
+                            <div class="relative group/input">
+                                <input type="text" name="image_url" id="portfolio_image_url" placeholder="Paste link from IconScout..." class="dash-input pr-28">
+                                <button type="button" onclick="verifyIconLink('portfolio_image_url')" 
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
+                                    Verify Link ✦
+                                </button>
+                            </div>
+                        </div>
                         <div><label class="field-label">Project URL</label><input type="text" name="project_url" placeholder="https://..." class="dash-input"></div>
                         <div><label class="field-label">Description</label><textarea name="description" placeholder="Project breakdown..." class="dash-input h-24 resize-none"></textarea></div>
                         <button type="submit" class="btn-primary">Deploy to Studio ✦</button>
@@ -580,11 +589,17 @@
                                 <span class="text-[10px] font-mono" style="color: var(--muted)">#{{ $loop->iteration }}</span>
                             </div>
                             <div id="edit-portfolio-{{ $item->id }}" class="hidden mt-5 pt-5 animate-fade-in" style="border-top: 1px solid var(--divider);">
-                                <form action="/admin/portfolio/{{ $item->id }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                                <form action="/admin/portfolio/{{ $item->id }}" method="POST" enctype="multipart/form-data" class="space-y-3" onsubmit="handleIconScoutSubmit(this)">
                                     @csrf @method('PUT')
                                     <input type="text" name="title" value="{{ $item->title }}" class="dash-input" required>
                                     <input type="text" name="category" value="{{ $item->category }}" class="dash-input" required>
-                                    <input type="text" name="image_url" value="{{ $item->image_url }}" class="dash-input" placeholder="Image URL">
+                                    <div class="relative group/input">
+                                        <input type="text" name="image_url" id="edit_image_url_{{ $item->id }}" value="{{ $item->image_url }}" class="dash-input pr-28" placeholder="Image URL">
+                                        <button type="button" onclick="verifyIconLink('edit_image_url_{{ $item->id }}')" 
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
+                                            Verify ✦
+                                        </button>
+                                    </div>
                                     <input type="text" name="project_url" value="{{ $item->project_url }}" class="dash-input" placeholder="Project Link">
                                     <button type="submit" class="btn-save">Update Project</button>
                                 </form>
@@ -1226,6 +1241,79 @@
             };
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    // IconScout Auto-Verification Robot
+    async function verifyIconLink(inputId) {
+        const input = document.getElementById(inputId);
+        const url = input.value;
+        if(!url || !url.startsWith('http')) {
+            alert('Please enter a valid URL first.');
+            return;
+        }
+
+        const btn = event.currentTarget;
+        const originalText = btn.innerHTML;
+        
+        // 1. Force open the URL in a new window/tab as requested
+        const verifyWindow = window.open(url, '_blank');
+        
+        btn.innerHTML = 'Verifying... ✦';
+        btn.disabled = true;
+
+        // 2. Small delay to let the page start loading in the other tab
+        setTimeout(async () => {
+            try {
+                const response = await fetch('{{ route("admin.fetch-metadata") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ url })
+                });
+                const data = await response.json();
+                
+                if(data.success) {
+                    input.value = data.image_url;
+                    btn.innerHTML = 'Success! ✓';
+                    btn.style.color = '#22c55e';
+                    // Optional: close the window if verification was auto-successful
+                    // verifyWindow.close(); 
+                } else {
+                    // Fail gracefully - tell the user to get it manually
+                    alert('The robot is still being blocked by IconScout.\n\nPlease find the image on the page I just opened,\nRight-click it -> "Copy Image Address",\nand paste it back here.');
+                    btn.innerHTML = 'Manual Link ✎';
+                }
+            } catch (error) {
+                btn.innerHTML = 'Error ✖';
+            } finally {
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.color = '';
+                }, 3000);
+            }
+        }, 2000); // 2 second delay for the new tab to "breathe"
+    }
+
+    // Handle Form Submission for Auto-Verification Window
+    function handleIconScoutSubmit(form) {
+        const imageUrlInput = form.querySelector('input[name="image_url"]');
+        const url = imageUrlInput ? imageUrlInput.value : '';
+        
+        if (url && url.includes('iconscout.com')) {
+            // Force open the verifying link in a new tab as requested
+            window.open(url, '_blank');
+            
+            // Show a "Processing" state on the button
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = 'Uploading & Saving... ✦';
+                submitBtn.style.opacity = '0.7';
+            }
+        }
+        return true; // Continue with form submission
     }
 </script>
 </body>

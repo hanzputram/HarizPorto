@@ -96,4 +96,5 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('/capability', [AdminController::class, 'storeCapability']);
     Route::put('/capability/{id}', [AdminController::class, 'updateCapability']);
     Route::delete('/capability/{id}', [AdminController::class, 'deleteCapability']);
+    Route::post('/fetch-metadata', [AdminController::class, 'fetchMetadata'])->name('admin.fetch-metadata');
 });

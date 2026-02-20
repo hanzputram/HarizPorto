@@ -11,6 +11,9 @@ use App\Models\Stat;
 use App\Models\Workflow;
 use App\Models\Capability;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -44,6 +47,9 @@ class AdminController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
+        } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com')) {
+            $localPath = $this->uploadIconScoutImage($request->image_url);
+            if ($localPath) $data['image_url'] = $localPath;
         }
 
         Portfolio::create($data);
@@ -67,6 +73,9 @@ class AdminController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
+        } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com') && $request->image_url !== $portfolio->image_url) {
+            $localPath = $this->uploadIconScoutImage($request->image_url);
+            if ($localPath) $data['image_url'] = $localPath;
         }
 
         $portfolio->update($data);
@@ -224,5 +233,124 @@ class AdminController extends Controller
     {
         Capability::findOrFail($id)->delete();
         return back()->with('success', 'Capability deleted!');
+    }
+
+    public function fetchMetadata(Request $request)
+    {
+        $request->validate(['url' => 'required|url']);
+        $url = $request->url;
+
+        try {
+            // Priority 0: IconScout CDN Link Generator (Formula-based)
+            // This bypasses bot detection and works perfectly for IconScout patterns
+            if (str_contains($url, 'iconscout.com')) {
+                // Type 1: 3D Icon Pack (slug_id)
+                if (preg_match('/iconscout\.com\/3d-icon-pack\/([^\/_]+)_(\d+)/', $url, $matches)) {
+                    $slug = $matches[1];
+                    $id = $matches[2];
+                    return response()->json([
+                        'success' => true, 
+                        'image_url' => "https://cdn3d.iconscout.com/3d-pack/preview/{$slug}-png-download-{$id}.jpg"
+                    ]);
+                }
+                
+                // Type 2: 3D Illustration / Flat Illustration (slug-id)
+                if (preg_match('/iconscout\.com\/(3d-illustration|illustration|icon)\/([^\/]+)-(\d+)/', $url, $matches)) {
+                    $type = $matches[1];
+                    $slug = $matches[2];
+                    $id = $matches[3];
+                    return response()->json([
+                        'success' => true, 
+                        'image_url' => "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.jpg"
+                    ]);
+                }
+            }
+
+            $html = '';
+            $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+            // Priority 1: Browsershot (Chromium) - Best for bypass if pattern fails
+            $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+            $nodePath = $isWindows ? trim(shell_exec('where node')) : trim(shell_exec('which node'));
+            
+            if ($isWindows && $nodePath) {
+                $nodePath = explode("\r\n", $nodePath)[0];
+            }
+
+            if ($nodePath && file_exists($nodePath)) {
+                try {
+                    $browser = \Spatie\Browsershot\Browsershot::url($url)
+                        ->userAgent($userAgent)
+                        ->timeout(30)
+                        ->noSandbox();
+                    
+                    if ($isWindows) {
+                        $browser->setNodeBinary($nodePath)
+                                ->setNpmBinary(str_replace('node.exe', 'npm.cmd', $nodePath));
+                    }
+
+                    $html = $browser->bodyHtml();
+                } catch (\Exception $e) { }
+            }
+
+            if (!$html) {
+                // Fallback: cURL with User-Agent
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+                $html = curl_exec($ch);
+                curl_close($ch);
+            }
+
+            if ($html) {
+                $patterns = [
+                    '/<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']/',
+                    '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']/',
+                    '/<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']/',
+                    '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']twitter:image["\']/'
+                ];
+
+                foreach ($patterns as $pattern) {
+                    if (preg_match($pattern, $html, $matches)) {
+                        return response()->json(['success' => true, 'image_url' => $matches[1]]);
+                    }
+                }
+            }
+
+            // Final Fallback: OpenGraph package
+            $og = new \shweshi\OpenGraph\OpenGraph();
+            $data = $og->fetch($url);
+            
+            if (isset($data['image']) && !empty($data['image'])) {
+                return response()->json(['success' => true, 'image_url' => $data['image']]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'The site is blocking the fetching robot. Opening the page for you to verify manually...']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+    private function uploadIconScoutImage($url)
+    {
+        try {
+            $response = $this->fetchMetadata(new Request(['url' => $url]));
+            $data = $response->getData();
+            if (isset($data->success) && $data->success) {
+                $imageUrl = $data->image_url;
+                $imageContents = file_get_contents($imageUrl);
+                if ($imageContents) {
+                    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
+                    $filename = 'icon_' . Str::random(10) . '.' . $ext;
+                    $path = 'portfolios/' . $filename;
+                    Storage::disk('public')->put($path, $imageContents);
+                    return '/storage/' . $path;
+                }
+            }
+        } catch (\Exception $e) {}
+        return null;
     }
 }
