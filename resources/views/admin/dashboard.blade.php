@@ -1122,8 +1122,14 @@
                                 <label class="field-label">About Display Image</label>
                                 <div class="relative group">
                                     <div id="about-preview-container" class="w-full aspect-square rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
-                                        @if($settings['about_image'] ?? false)
-                                            <img src="{{ str_starts_with($settings['about_image'], 'http') ? $settings['about_image'] : asset($settings['about_image']) }}" class="w-full h-full object-cover" id="about-preview">
+                                        @php
+                                            $aboutImg = $settings['about_image'] ?? false;
+                                            $isExternal = $aboutImg && str_starts_with($aboutImg, 'http');
+                                            // Fallback if the database has a path but the file is physically missing or corrupted
+                                            $finalUrl = $aboutImg ? ($isExternal ? $aboutImg : asset($aboutImg)) : null;
+                                        @endphp
+                                        @if($finalUrl)
+                                            <img src="{{ $finalUrl }}" class="w-full h-full object-cover" id="about-preview" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Studio&background=random';">
                                         @else
                                             <span class="text-4xl opacity-20" id="about-placeholder">🖼️</span>
                                         @endif

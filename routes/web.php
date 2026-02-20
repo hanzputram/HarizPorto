@@ -31,22 +31,22 @@ Route::get('/', function () {
 Route::middleware('auth')->prefix('admin/tools')->group(function () {
     Route::get('/storage-link', function () {
         try {
-            // Support both /public and /public_html
             $publicPath = public_path('storage');
-            if (file_exists($publicPath)) {
-                return "The 'storage' link already exists. If images are broken, delete 'public_html/storage' manually first.";
+            
+            // Check if user wants a force repair (common for 404 issues)
+            if (file_exists($publicPath) || is_link($publicPath)) {
+                // Try to delete existing link/file to allow clean recreation
+                if (PHP_OS_FAMILY === 'Windows') {
+                    is_dir($publicPath) ? rmdir($publicPath) : unlink($publicPath);
+                } else {
+                    exec("rm -rf " . escapeshellarg($publicPath));
+                }
             }
+            
             \Illuminate\Support\Facades\Artisan::call('storage:link');
-            return "Storage link created successfully via Artisan.";
+            return "Storage link repaired and recreated successfully. Check if images are working now.";
         } catch (\Exception $e) {
-            // Manual fallback for some restricted environments
-            try {
-                $target = storage_path('app/public');
-                symlink($target, public_path('storage'));
-                return "Storage link created successfully via symlink fallback.";
-            } catch (\Exception $e2) {
-                return "Failed! Error: " . $e2->getMessage();
-            }
+            return "Failed to repair link! Error: " . $e->getMessage() . ". Please delete 'public/storage' manually via File Manager.";
         }
     })->name('admin.tools.storage');
 

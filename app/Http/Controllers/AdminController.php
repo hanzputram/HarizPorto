@@ -133,6 +133,12 @@ class AdminController extends Controller
             Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/' . $path]);
         }
 
+        // Auto-sanitize existing paths with leading slashes if they were just saved
+        $aboutImage = Setting::where('key', 'about_image')->first();
+        if ($aboutImage && str_starts_with($aboutImage->value, '/')) {
+            $aboutImage->update(['value' => ltrim($aboutImage->value, '/')]);
+        }
+
         return back()->with('success', 'Settings updated!');
     }
 
