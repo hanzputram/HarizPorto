@@ -535,7 +535,9 @@
           </a>
 
           <div class="flex justify-between items-center mt-4 px-2 text-left">
-            <h3 class="text-gray-900 dark:text-white font-bold text-lg">{{ $work->title }}</h3>
+            <a href="{{ $work->project_url ?? '#' }}" target="_blank">
+              <h3 class="text-gray-900 dark:text-white font-bold text-lg hover:text-primary transition-colors">{{ $work->title }}</h3>
+            </a>
             <span class="text-gray-500 dark:text-gray-600 text-xs font-mono uppercase">{{ $work->category }}</span>
           </div>
         </div>

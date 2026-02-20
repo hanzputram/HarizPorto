@@ -165,7 +165,9 @@
                 </div>
             </a>
             <div class="hidden md:flex justify-between items-center mt-6 px-2">
-                <h3 class="text-gray-900 dark:text-white font-black uppercase text-sm tracking-tight">{{ $work->title }}</h3>
+                <a href="{{ $work->project_url ?? '#' }}" target="_blank">
+                    <h3 class="text-gray-900 dark:text-white font-black uppercase text-sm tracking-tight hover:text-primary transition-colors">{{ $work->title }}</h3>
+                </a>
                 <span class="text-gray-400 dark:text-gray-600 text-[10px] font-bold uppercase tracking-widest">{{ $work->category }}</span>
             </div>
         </div>

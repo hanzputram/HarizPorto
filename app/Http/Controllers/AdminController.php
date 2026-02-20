@@ -48,8 +48,13 @@ class AdminController extends Controller
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com')) {
-            $cdnUrl = $this->getIconScoutPreviewUrl($request->image_url);
-            if ($cdnUrl) $data['image_url'] = $cdnUrl;
+            $originalUrl = $request->image_url;
+            $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
+            if ($cdnUrl) {
+                $data['image_url'] = $cdnUrl;
+                // Automatically set Project URL to the original IconScout page
+                $data['project_url'] = $originalUrl;
+            }
         }
 
         Portfolio::create($data);
@@ -74,8 +79,13 @@ class AdminController extends Controller
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com') && $request->image_url !== $portfolio->image_url) {
-            $cdnUrl = $this->getIconScoutPreviewUrl($request->image_url);
-            if ($cdnUrl) $data['image_url'] = $cdnUrl;
+            $originalUrl = $request->image_url;
+            $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
+            if ($cdnUrl) {
+                $data['image_url'] = $cdnUrl;
+                // Automatically set Project URL to the original IconScout page
+                $data['project_url'] = $originalUrl;
+            }
         }
 
         $portfolio->update($data);
