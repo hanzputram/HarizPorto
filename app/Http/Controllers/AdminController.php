@@ -130,7 +130,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('about_image')) {
             $path = $request->file('about_image')->store('about', 'public');
-            Setting::updateOrCreate(['key' => 'about_image'], ['value' => '/storage/' . $path]);
+            Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/' . $path]);
         }
 
         return back()->with('success', 'Settings updated!');

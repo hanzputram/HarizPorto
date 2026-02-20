@@ -1121,11 +1121,11 @@
                             <div class="lg:col-span-1">
                                 <label class="field-label">About Display Image</label>
                                 <div class="relative group">
-                                    <div class="w-full aspect-square rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
+                                    <div id="about-preview-container" class="w-full aspect-square rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
                                         @if($settings['about_image'] ?? false)
-                                            <img src="{{ $settings['about_image'] }}" class="w-full h-full object-cover" id="about-preview">
+                                            <img src="{{ str_starts_with($settings['about_image'], 'http') ? $settings['about_image'] : asset($settings['about_image']) }}" class="w-full h-full object-cover" id="about-preview">
                                         @else
-                                            <span class="text-4xl opacity-20">🖼️</span>
+                                            <span class="text-4xl opacity-20" id="about-placeholder">🖼️</span>
                                         @endif
                                     </div>
                                     <input type="file" name="about_image" id="about_image_input" class="hidden" accept="image/*" onchange="previewImage(this, 'about-preview')">
@@ -1287,14 +1287,19 @@
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const preview = document.getElementById(previewId);
-                const container = preview.parentElement;
+                let preview = document.getElementById(previewId);
+                const container = document.getElementById(previewId + '-container');
+                const placeholder = document.getElementById(previewId + '-placeholder');
                 
-                // If the preview <img> doesn't exist yet (e.g., initial state), create it or find it
-                if (!preview && container) {
-                    container.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" id="${previewId}">`;
-                } else if (preview) {
+                if (preview) {
                     preview.src = e.target.result;
+                } else if (container) {
+                    if (placeholder) placeholder.remove();
+                    preview = document.createElement('img');
+                    preview.id = previewId;
+                    preview.src = e.target.result;
+                    preview.className = 'w-full h-full object-cover';
+                    container.appendChild(preview);
                 }
             };
             reader.readAsDataURL(input.files[0]);
