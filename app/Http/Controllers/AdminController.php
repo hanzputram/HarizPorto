@@ -48,8 +48,8 @@ class AdminController extends Controller
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com')) {
-            $localPath = $this->uploadIconScoutImage($request->image_url);
-            if ($localPath) $data['image_url'] = $localPath;
+            $cdnUrl = $this->getIconScoutPreviewUrl($request->image_url);
+            if ($cdnUrl) $data['image_url'] = $cdnUrl;
         }
 
         Portfolio::create($data);
@@ -74,8 +74,8 @@ class AdminController extends Controller
             $path = $request->file('image')->store('portfolios', 'public');
             $data['image_url'] = '/storage/' . $path;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com') && $request->image_url !== $portfolio->image_url) {
-            $localPath = $this->uploadIconScoutImage($request->image_url);
-            if ($localPath) $data['image_url'] = $localPath;
+            $cdnUrl = $this->getIconScoutPreviewUrl($request->image_url);
+            if ($cdnUrl) $data['image_url'] = $cdnUrl;
         }
 
         $portfolio->update($data);
@@ -242,27 +242,10 @@ class AdminController extends Controller
 
         try {
             // Priority 0: IconScout CDN Link Generator (Formula-based)
-            // This bypasses bot detection and works perfectly for IconScout patterns
             if (str_contains($url, 'iconscout.com')) {
-                // Type 1: 3D Icon Pack (slug_id)
-                if (preg_match('/iconscout\.com\/3d-icon-pack\/([^\/_]+)_(\d+)/', $url, $matches)) {
-                    $slug = $matches[1];
-                    $id = $matches[2];
-                    return response()->json([
-                        'success' => true, 
-                        'image_url' => "https://cdn3d.iconscout.com/3d-pack/preview/{$slug}-png-download-{$id}.jpg"
-                    ]);
-                }
-                
-                // Type 2: 3D Illustration / Flat Illustration (slug-id)
-                if (preg_match('/iconscout\.com\/(3d-illustration|illustration|icon)\/([^\/]+)-(\d+)/', $url, $matches)) {
-                    $type = $matches[1];
-                    $slug = $matches[2];
-                    $id = $matches[3];
-                    return response()->json([
-                        'success' => true, 
-                        'image_url' => "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.jpg"
-                    ]);
+                $cdnUrl = $this->getIconScoutPreviewUrl($url);
+                if ($cdnUrl) {
+                    return response()->json(['success' => true, 'image_url' => $cdnUrl]);
                 }
             }
 
@@ -334,42 +317,21 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
-    private function uploadIconScoutImage($url)
+    private function getIconScoutPreviewUrl($url)
     {
-        try {
-            // 1. Get the direct image URL using our pattern/detector
-            $response = $this->fetchMetadata(new Request(['url' => $url]));
-            $data = json_decode($response->getContent(), true);
-
-            if (isset($data['success']) && $data['success']) {
-                $imageUrl = $data['image_url'];
-                
-                // 2. Download using cURL (More reliable on production servers than file_get_contents)
-                $ch = curl_init($imageUrl);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-                $imageContents = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-
-                if ($imageContents && $httpCode === 200) {
-                    // Determine extension (default to jpg for iconscout previews)
-                    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
-                    if (str_contains($imageUrl, 'cdn3d')) $ext = 'jpg';
-                    
-                    $filename = 'icon_' . time() . '_' . Str::random(5) . '.' . $ext;
-                    $path = 'portfolios/' . $filename;
-                    
-                    Storage::disk('public')->put($path, $imageContents);
-                    return '/storage/' . $path;
-                }
-            }
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("IconScout Auto-Fetch Error: " . $e->getMessage());
+        // Type 1: 3D Icon Pack (slug_id)
+        if (preg_match('/iconscout\.com\/3d-icon-pack\/([^\/_]+)_(\d+)/', $url, $matches)) {
+            return "https://cdn3d.iconscout.com/3d-pack/preview/{$matches[1]}-png-download-{$matches[2]}.jpg";
         }
+        
+        // Type 2: 3D Illustration / Flat Illustration (slug-id)
+        if (preg_match('/iconscout\.com\/(3d-illustration|illustration|icon)\/([^\/_?-]+)[_-](\d+)/', $url, $matches)) {
+            $type = $matches[1];
+            $slug = $matches[2];
+            $id = $matches[3];
+            return "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.jpg";
+        }
+
         return null;
     }
 }

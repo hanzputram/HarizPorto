@@ -1309,7 +1309,7 @@
             // Show a "Processing" state on the button
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
-                submitBtn.innerHTML = 'Uploading & Saving... ✦';
+                submitBtn.innerHTML = 'Processing & Saving... ✦';
                 submitBtn.style.opacity = '0.7';
             }
         }
