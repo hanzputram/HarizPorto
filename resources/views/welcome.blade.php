@@ -525,11 +525,11 @@
         <div class="group cursor-pointer">
           <a href="{{ $work->project_url ?? '#' }}" target="_blank" class="block rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 relative h-64 md:h-80 bg-white dark:bg-surface-card">
             @if($work->image_url)
-              <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 dark:opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
+              <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-90 dark:opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
             @else
               <div class="w-full h-full flex items-center justify-center text-6xl opacity-10">🧊</div>
             @endif
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+            <div class="absolute inset-0 bg-black/30 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
               <span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">View Project</span>
             </div>
           </a>

@@ -151,11 +151,11 @@
         <div class="group cursor-pointer">
             <a href="{{ $work->project_url ?? '#' }}" target="_blank" class="block rounded-3xl overflow-hidden border border-white/10 relative aspect-square md:aspect-[4/5] bg-surface-card transition-all duration-300 card-hover">
                 @if($work->image_url)
-                <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
+                <img alt="{{ $work->title }}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:blur-[2px] opacity-80 group-hover:opacity-100" src="{{ $work->image_url }}"/>
                 @else
                 <div class="w-full h-full flex items-center justify-center text-6xl opacity-10">🧊</div>
                 @endif
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                <div class="absolute inset-0 bg-black/40 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
                     <span class="text-primary text-[10px] font-black uppercase tracking-widest mb-2">{{ $work->category }}</span>
                     <h3 class="text-white font-bold text-2xl mb-2">{{ $work->title }}</h3>
                     <p class="text-gray-400 text-sm line-clamp-2 mb-4">{{ $work->description }}</p>
