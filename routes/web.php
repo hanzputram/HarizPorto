@@ -22,8 +22,9 @@ Route::get('/', function () {
     $stats = Stat::all();
     $workflows = Workflow::orderBy('order')->get();
     $capabilities = Capability::orderBy('order')->get();
+    $infoCards = \App\Models\InfoCard::orderBy('order')->get();
     $settings = Setting::pluck('value', 'key');
-    return view('welcome', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities'));
+    return view('welcome', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities', 'infoCards'));
 });
 
 // Production Maintenance - Tools for shared hosting
@@ -96,5 +97,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('/capability', [AdminController::class, 'storeCapability']);
     Route::put('/capability/{id}', [AdminController::class, 'updateCapability']);
     Route::delete('/capability/{id}', [AdminController::class, 'deleteCapability']);
+    Route::post('/info-card', [AdminController::class, 'storeInfoCard']);
+    Route::put('/info-card/{id}', [AdminController::class, 'updateInfoCard']);
+    Route::delete('/info-card/{id}', [AdminController::class, 'deleteInfoCard']);
     Route::post('/fetch-metadata', [AdminController::class, 'fetchMetadata'])->name('admin.fetch-metadata');
 });

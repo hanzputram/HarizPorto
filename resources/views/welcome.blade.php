@@ -499,14 +499,12 @@
         </p>
 
         <div class="grid grid-cols-2 gap-4">
-          <div class="p-4 about-card rounded-xl transition-colors">
-            <span class="block text-xs text-gray-500 uppercase font-bold mb-1">{{ $settings['about_card1_label'] ?? 'Primary Tools' }}</span>
-            <span class="text-gray-900 dark:text-white font-medium">{{ $settings['about_pipeline_tools'] ?? 'Blender, Cinema 4D' }}</span>
-          </div>
-          <div class="p-4 about-card rounded-xl transition-colors">
-            <span class="block text-xs text-gray-500 uppercase font-bold mb-1">{{ $settings['about_card2_label'] ?? 'Experience' }}</span>
-            <span class="text-gray-900 dark:text-white font-medium">{{ $settings['about_experience_years'] ?? '5+' }} Years in 3D</span>
-          </div>
+          @foreach($infoCards as $card)
+            <div class="p-4 about-card rounded-xl transition-colors">
+              <span class="block text-xs text-gray-500 uppercase font-bold mb-1">{{ $card->label }}</span>
+              <span class="text-gray-900 dark:text-white font-medium">{{ $card->value }}</span>
+            </div>
+          @endforeach
         </div>
       </div>
     </div>

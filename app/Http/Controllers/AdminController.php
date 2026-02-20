@@ -10,6 +10,7 @@ use App\Models\Faq;
 use App\Models\Stat;
 use App\Models\Workflow;
 use App\Models\Capability;
+use App\Models\InfoCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -26,9 +27,10 @@ class AdminController extends Controller
         $stats = Stat::all();
         $workflows = Workflow::orderBy('order')->get();
         $capabilities = Capability::orderBy('order')->get();
+        $infoCards = InfoCard::orderBy('order')->get();
         $settings = Setting::pluck('value', 'key');
 
-        return view('admin.dashboard', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities'));
+        return view('admin.dashboard', compact('portfolios', 'reviews', 'pricings', 'settings', 'faqs', 'stats', 'workflows', 'capabilities', 'infoCards'));
     }
 
     // Portfolio
@@ -243,6 +245,27 @@ class AdminController extends Controller
     {
         Capability::findOrFail($id)->delete();
         return back()->with('success', 'Capability deleted!');
+    }
+
+    // Info Cards
+    public function storeInfoCard(Request $request)
+    {
+        $request->validate(['label' => 'required', 'value' => 'required']);
+        InfoCard::create($request->all());
+        return back()->with('success', 'Info Card added!');
+    }
+
+    public function updateInfoCard(Request $request, $id)
+    {
+        $card = InfoCard::findOrFail($id);
+        $card->update($request->except(['_token', '_method']));
+        return back()->with('success', 'Info Card updated!');
+    }
+
+    public function deleteInfoCard($id)
+    {
+        InfoCard::findOrFail($id)->delete();
+        return back()->with('success', 'Info Card deleted!');
     }
 
     public function fetchMetadata(Request $request)

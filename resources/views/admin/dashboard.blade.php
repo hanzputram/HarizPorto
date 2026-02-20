@@ -421,6 +421,9 @@
         <a href="#workflows" class="sidebar-link">
             <span class="icon">⚡</span> Workflow
         </a>
+        <a href="#info-cards" class="sidebar-link">
+            <span class="icon">📇</span> Info Cards
+        </a>
 
         <p class="px-3 text-[9px] font-black uppercase tracking-[0.2em] mb-3 mt-6" style="color: var(--sidebar-heading)">Business</p>
         <a href="#stats" class="sidebar-link">
@@ -1022,6 +1025,61 @@
             </div>
         </section>
 
+        <!-- ═══════════════════════════════ ABOUT INFO CARDS ═══════════════════════════════ -->
+        <section id="info-cards" class="mb-20">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <span class="section-label">Configuration</span>
+                    <h2 class="section-title">About Info Cards</h2>
+                    <p class="section-sub">Dynamic highlights for your bio section</p>
+                </div>
+                <button onclick="document.getElementById('add-info-card-form').classList.toggle('hidden')" class="btn-ghost">+ Add Card</button>
+            </div>
+
+            <div id="add-info-card-form" class="hidden dash-card p-7 mb-8 animate-fade-in max-w-xl">
+                <form action="/admin/info-card" method="POST" class="grid sm:grid-cols-2 gap-5">
+                    @csrf
+                    <div><label class="field-label">Card Label</label><input type="text" name="label" placeholder="e.g. Primary Tools" class="dash-input" required></div>
+                    <div><label class="field-label">Card Value</label><input type="text" name="value" placeholder="e.g. 1000+ Work Done" class="dash-input" required></div>
+                    <!-- <div class="sm:col-span-2"><label class="field-label">Order</label><input type="number" name="order" value="{{ count($infoCards) + 1 }}" class="dash-input"></div> -->
+                    <button type="submit" class="sm:col-span-2 btn-primary">Activate Info Card</button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                @forelse($infoCards as $card)
+                <div class="dash-card p-6 group relative">
+                    <div class="text-[9px] font-black uppercase tracking-widest mb-2" style="color: var(--muted)">Card #{{ $loop->iteration }}</div>
+                    <div class="text-sm font-black text-main uppercase mb-1">{{ $card->label }}</div>
+                    <div class="text-xs font-bold" style="color: var(--muted-2)">{{ $card->value }}</div>
+                    
+                    <div class="absolute top-4 right-4 flex gap-1.5">
+                        <button onclick="document.getElementById('edit-info-card-{{ $card->id }}').classList.toggle('hidden')" class="action-btn action-btn-edit">✎</button>
+                        <form action="/admin/info-card/{{ $card->id }}" method="POST" onsubmit="return confirm('Delete?')">
+                            @csrf @method('DELETE')
+                            <button class="action-btn action-btn-del">×</button>
+                        </form>
+                    </div>
+                    
+                    <div id="edit-info-card-{{ $card->id }}" class="hidden mt-5 pt-5 animate-fade-in space-y-3" style="border-top: 1px solid var(--divider);">
+                        <form action="/admin/info-card/{{ $card->id }}" method="POST" class="space-y-3">
+                            @csrf @method('PUT')
+                            <input type="text" name="label" value="{{ $card->label }}" class="dash-input" required placeholder="Label">
+                            <input type="text" name="value" value="{{ $card->value }}" class="dash-input" required placeholder="Value">
+                            <input type="number" name="order" value="{{ $card->order }}" class="dash-input" required placeholder="Order">
+                            <button type="submit" class="btn-save">Update Card</button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div class="col-span-full py-16 dash-card text-center">
+                    <span class="text-4xl opacity-10 block mb-3">📇</span>
+                    <p class="text-[11px] font-bold uppercase tracking-widest" style="color: var(--muted)">No info cards yet</p>
+                </div>
+                @endforelse
+            </div>
+        </section>
+
         <!-- ═══════════════════════════════ SITE SETTINGS ═══════════════════════════════ -->
         <section id="settings" class="mb-20">
             <div class="mb-8">
@@ -1088,25 +1146,7 @@
 
                     <hr class="form-divider">
 
-                    <!-- About Cards -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-white text-xs">📊</div>
-                            <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">About Info Cards</h4>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-5">
-                            <div class="p-5 rounded-xl space-y-3" style="background: var(--input-bg); border: 1px solid var(--divider);">
-                                <p class="text-[9px] font-black uppercase tracking-widest" style="color: var(--muted)">Card 1 — Tools</p>
-                                <input type="text" name="about_card1_label" value="{{ $settings['about_card1_label'] ?? 'Primary Tools' }}" class="dash-input" placeholder="Card Label">
-                                <input type="text" name="about_pipeline_tools" value="{{ $settings['about_pipeline_tools'] ?? 'Blender, Cinema 4D' }}" class="dash-input" placeholder="Card Value">
-                            </div>
-                            <div class="p-5 rounded-xl space-y-3" style="background: var(--input-bg); border: 1px solid var(--divider);">
-                                <p class="text-[9px] font-black uppercase tracking-widest" style="color: var(--muted)">Card 2 — Experience</p>
-                                <input type="text" name="about_card2_label" value="{{ $settings['about_card2_label'] ?? 'Experience' }}" class="dash-input" placeholder="Card Label">
-                                <input type="text" name="about_experience_years" value="{{ $settings['about_experience_years'] ?? '5+' }}" class="dash-input" placeholder="Card Value">
-                            </div>
-                        </div>
-                    </div>
+
 
                     <button type="submit" class="btn-gradient">Update Global Settings ✦</button>
                 </form>
