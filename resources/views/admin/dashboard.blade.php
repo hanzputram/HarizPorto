@@ -591,16 +591,16 @@
                             <div id="edit-portfolio-{{ $item->id }}" class="hidden mt-5 pt-5 animate-fade-in" style="border-top: 1px solid var(--divider);">
                                 <form action="/admin/portfolio/{{ $item->id }}" method="POST" enctype="multipart/form-data" class="space-y-3" onsubmit="handleIconScoutSubmit(this)">
                                     @csrf @method('PUT')
-                                    <input type="text" name="title" value="{{ $item->title }}" class="dash-input" required>
-                                    <input type="text" name="category" value="{{ $item->category }}" class="dash-input" required>
+                                    <label class="field-label">Visual Title</label><input type="text" name="title" value="{{ $item->title }}" class="dash-input" required>
+                                    <label class="field-label">Category</label><input type="text" name="category" value="{{ $item->category }}" class="dash-input" required>
                                     <div class="relative group/input">
-                                        <input type="text" name="image_url" id="edit_image_url_{{ $item->id }}" value="{{ $item->image_url }}" class="dash-input pr-28" placeholder="Image URL">
+                                        <label class="field-label">Image URL / IconScout</label><input type="text" name="image_url" id="edit_image_url_{{ $item->id }}" value="{{ $item->image_url }}" class="dash-input pr-28" placeholder="Image URL">
                                         <!-- <button type="button" onclick="verifyIconLink('edit_image_url_{{ $item->id }}')" 
                                                 class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[9px] font-black uppercase tracking-widest transition-all">
                                             Verify ✦
                                         </button> -->
                                     </div>
-                                    <input type="text" name="project_url" value="{{ $item->project_url }}" class="dash-input" placeholder="Project Link">
+                                    <label class="field-label">Project URL</label><input type="text" name="project_url" value="{{ $item->project_url }}" class="dash-input" placeholder="Project Link">
                                     <button type="submit" class="btn-save">Update Project</button>
                                 </form>
                             </div>
