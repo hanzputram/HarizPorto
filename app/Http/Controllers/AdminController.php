@@ -47,8 +47,14 @@ class AdminController extends Controller
         $data = $request->except(['_token', 'image']);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('portfolios', 'public');
-            $data['image_url'] = '/storage/' . $path;
+            $file = $request->file('image');
+            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
+            $targetPath = public_path('uploads/portfolios');
+            if (!file_exists($targetPath)) {
+                mkdir($targetPath, 0755, true);
+            }
+            $file->move($targetPath, $filename);
+            $data['image_url'] = 'uploads/portfolios/' . $filename;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com')) {
             $originalUrl = $request->image_url;
             $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
@@ -78,8 +84,14 @@ class AdminController extends Controller
         $data = $request->except(['_token', '_method', 'image']);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('portfolios', 'public');
-            $data['image_url'] = '/storage/' . $path;
+            $file = $request->file('image');
+            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
+            $targetPath = public_path('uploads/portfolios');
+            if (!file_exists($targetPath)) {
+                mkdir($targetPath, 0755, true);
+            }
+            $file->move($targetPath, $filename);
+            $data['image_url'] = 'uploads/portfolios/' . $filename;
         } elseif ($request->image_url && str_contains($request->image_url, 'iconscout.com') && $request->image_url !== $portfolio->image_url) {
             $originalUrl = $request->image_url;
             $cdnUrl = $this->getIconScoutPreviewUrl($originalUrl);
@@ -131,25 +143,20 @@ class AdminController extends Controller
 
             if ($request->hasFile('about_image')) {
                 $request->validate([
-                    'about_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Increased to 5MB
+                    'about_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120',
                 ]);
 
                 $file = $request->file('about_image');
                 $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
                 
-                // Ensure directory exists
-                $targetDir = storage_path('app/public/about');
-                if (!file_exists($targetDir)) {
-                    mkdir($targetDir, 0755, true);
+                // Save directly to public folder to bypass symlink issues 
+                $targetPath = public_path('uploads/about');
+                if (!file_exists($targetPath)) {
+                    mkdir($targetPath, 0755, true);
                 }
-
-                $path = $file->storeAs('about', $filename, 'public');
                 
-                if ($path) {
-                    Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/' . $path]);
-                } else {
-                    return back()->with('error', 'Critical: File saved to memory but failed to write to disk. Check directory permissions.');
-                }
+                $file->move($targetPath, $filename);
+                Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'uploads/about/' . $filename]);
             }
 
             // Auto-sanitize existing paths
