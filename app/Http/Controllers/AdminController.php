@@ -138,41 +138,8 @@ class AdminController extends Controller
     {
         try {
             // 1. Update text settings
-            foreach ($request->except(['_token', '_method', 'about_image']) as $key => $value) {
+            foreach ($request->except(['_token', '_method']) as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            }
-
-            // 2. Handle Image Upload
-            if ($request->hasFile('about_image')) {
-                $file = $request->file('about_image');
-                
-                if (!$file->isValid()) {
-                    return back()->with('error', 'The uploaded file is not valid.');
-                }
-
-                $filename = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
-                
-                // Save directly to public/uploads/about
-                $targetPath = public_path('uploads/about');
-
-                if (!file_exists($targetPath)) {
-                    mkdir($targetPath, 0755, true);
-                }
-                
-                try {
-                    $file->move($targetPath, $filename);
-                } catch (\Exception $e) {
-                    return back()->with('error', 'Upload failed! Folder "public/uploads/about" might be locked. Error: ' . $e->getMessage());
-                }
-
-                // Save path for asset() helper (will be rewritten to uploads/ via .htaccess)
-                Setting::updateOrCreate(['key' => 'about_image'], ['value' => 'storage/about/' . $filename]);
-            }
-
-            // 3. Clean up database slashes
-            $aboutImage = Setting::where('key', 'about_image')->first();
-            if ($aboutImage && str_starts_with($aboutImage->value, '/')) {
-                $aboutImage->update(['value' => ltrim($aboutImage->value, '/')]);
             }
 
             return back()->with('success', 'Full system state updated! Bio information is saved.');

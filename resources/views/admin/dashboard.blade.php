@@ -1140,29 +1140,7 @@
                             <h4 class="text-[10px] font-black uppercase tracking-widest text-muted">Professional Bio</h4>
                         </div>
                         <div class="grid lg:grid-cols-3 gap-8">
-                            <div class="lg:col-span-1">
-                                <label class="field-label">About Display Image</label>
-                                <div class="relative group">
-                                    <div id="about-preview-container" class="w-full aspect-square rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
-                                        @php
-                                            $aboutImg = $settings['about_image'] ?? false;
-                                            $isExternal = $aboutImg && str_starts_with($aboutImg, 'http');
-                                            // Fallback if the database has a path but the file is physically missing or corrupted
-                                            $finalUrl = $aboutImg ? ($isExternal ? $aboutImg : asset($aboutImg)) : null;
-                                        @endphp
-                                        @if($finalUrl)
-                                            <img src="{{ $finalUrl }}" class="w-full h-full object-cover" id="about-preview" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Studio&background=random';">
-                                        @else
-                                            <span class="text-4xl opacity-20" id="about-placeholder">🖼️</span>
-                                        @endif
-                                    </div>
-                                    <input type="file" name="about_image" id="about_image_input" class="hidden" accept="image/*" onchange="previewImage(this, 'about-preview')">
-                                    <button type="button" onclick="document.getElementById('about_image_input').click()" class="w-full py-3 bg-black/5 dark:bg-white/5 border border-dashed border-black/20 dark:border-white/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-colors">
-                                        Upload Image
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="lg:col-span-2 space-y-5">
+                            <div class="lg:col-span-3 space-y-5">
                                 <div class="grid grid-cols-2 gap-5">
                                     <div><label class="field-label">About Label</label><input type="text" name="about_label" value="{{ $settings['about_label'] ?? 'THE STUDIO' }}" class="dash-input"></div>
                                     <div><label class="field-label">About Heading</label><input type="text" name="about_heading" value="{{ $settings['about_heading'] ?? 'Pure Form.' }}" class="dash-input"></div>

@@ -478,13 +478,7 @@
 <section class="py-24 bg-white dark:bg-black">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="about-wrap rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center md:items-start gap-12">
-      <div class="flex-shrink-0 relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-        <div class="relative w-48 h-48 md:w-64 md:h-64 bg-gray-100 dark:bg-[#0A0A0A] rounded-xl overflow-hidden flex items-center justify-center">
-          @php $aboutImg = $settings['about_image'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuClvKk01I6_8TrXQOClo3z_bkELeWbNvtucvWZFoCmMpWyI9S8q9-16stSmKgkxd5cqiEPl0OJCWSh9QC9BiJLMe52wlBadCu3-qkCIyu6r9hY7QVMAZJnLwXEp_pc6-XwyMRLWU-LK_Z9gaW6Nya1uYCFWsnARyy3_qtj_WVQGBj6EUwKcojg0GAhAeGr4O2Lqwo4sxfURyvu-_fQNTizcUezQ-Vn39zMO6hlegZvMCGCXb9tAK7aObAjS0qGCXRxGMybQuB984a3M'; @endphp
-          <img alt="Pixel Art Portrait" class="w-full h-full object-cover" src="{{ str_starts_with($aboutImg, 'http') ? $aboutImg : asset($aboutImg) }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Avatar&background=random';"/>
-        </div>
-      </div>
+
 
       <div class="flex-1 text-center md:text-left">
         <h2 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white uppercase mb-2">
