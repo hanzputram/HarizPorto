@@ -39,7 +39,7 @@ class AdminController extends Controller
         $request->validate([
             'title' => 'required',
             'category' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp,jfif|max:2048',
             'image_url' => 'nullable',
             'project_url' => 'nullable|url',
         ]);
@@ -76,7 +76,7 @@ class AdminController extends Controller
         $request->validate([
             'title' => 'required',
             'category' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp,jfif|max:2048',
             'image_url' => 'nullable',
             'project_url' => 'nullable|url',
         ]);
@@ -286,18 +286,10 @@ class AdminController extends Controller
         $url = $request->url;
 
         try {
-            // Priority 0: IconScout CDN Link Generator (Formula-based)
-            if (str_contains($url, 'iconscout.com')) {
-                $cdnUrl = $this->getIconScoutPreviewUrl($url);
-                if ($cdnUrl) {
-                    return response()->json(['success' => true, 'image_url' => $cdnUrl]);
-                }
-            }
-
             $html = '';
             $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-            // Priority 1: Browsershot (Chromium) - Best for bypass if pattern fails
+            // Priority 0: Browsershot (Chromium) - Best for bypass
             $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
             $nodePath = $isWindows ? trim(shell_exec('where node')) : trim(shell_exec('which node'));
             
@@ -357,6 +349,14 @@ class AdminController extends Controller
                 return response()->json(['success' => true, 'image_url' => $data['image']]);
             }
 
+            // Priority 3: IconScout CDN Link Generator Fallback (Formula-based)
+            if (str_contains($url, 'iconscout.com')) {
+                $cdnUrl = $this->getIconScoutPreviewUrl($url);
+                if ($cdnUrl) {
+                    return response()->json(['success' => true, 'image_url' => $cdnUrl]);
+                }
+            }
+
             return response()->json(['success' => false, 'message' => 'The site is blocking the fetching robot. Opening the page for you to verify manually...']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -366,7 +366,7 @@ class AdminController extends Controller
     {
         // Type 1: 3D Icon Pack (slug_id)
         if (preg_match('/iconscout\.com\/3d-icon-pack\/([^\/_]+)_(\d+)/', $url, $matches)) {
-            return "https://cdn3d.iconscout.com/3d-pack/preview/{$matches[1]}-png-download-{$matches[2]}.jpg";
+            return "https://cdn3d.iconscout.com/3d-pack/preview/{$matches[1]}-png-download-{$matches[2]}.png";
         }
         
         // Type 2: 3D Illustration / Flat Illustration (slug-id)
@@ -374,7 +374,7 @@ class AdminController extends Controller
             $type = $matches[1];
             $slug = $matches[2];
             $id = $matches[3];
-            return "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.jpg";
+            return "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.png";
         }
 
         return null;
