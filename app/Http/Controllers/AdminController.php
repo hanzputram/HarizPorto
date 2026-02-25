@@ -364,19 +364,55 @@ class AdminController extends Controller
     }
     private function getIconScoutPreviewUrl($url)
     {
+        $base = null;
+        $type = null;
+
         // Type 1: 3D Icon Pack (slug_id)
         if (preg_match('/iconscout\.com\/3d-icon-pack\/([^\/_]+)_(\d+)/', $url, $matches)) {
-            return "https://cdn3d.iconscout.com/3d-pack/preview/{$matches[1]}-png-download-{$matches[2]}.png";
+            $base = "https://cdn3d.iconscout.com/3d-pack/preview/{$matches[1]}-png-download-{$matches[2]}";
         }
         
         // Type 2: 3D Illustration / Flat Illustration (slug-id)
-        if (preg_match('/iconscout\.com\/(3d-illustration|illustration|icon)\/([^\/_?-]+)[_-](\d+)/', $url, $matches)) {
+        elseif (preg_match('/iconscout\.com\/(3d-illustration|illustration|icon)\/([^\/_?-]+)[_-](\d+)/', $url, $matches)) {
             $type = $matches[1];
             $slug = $matches[2];
             $id = $matches[3];
-            return "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}.png";
+            $base = "https://cdn3d.iconscout.com/{$type}/preview/{$slug}-png-download-{$id}";
+        }
+
+        if ($base) {
+            // Priority: Check .png first, then .jpg
+            foreach (['.png', '.jpg'] as $ext) {
+                $testUrl = $base . $ext;
+                if ($this->checkUrlExists($testUrl)) {
+                    return $testUrl;
+                }
+            }
+            // Final fallback to .png if checking fails
+            return $base . ".png";
         }
 
         return null;
+    }
+
+    private function checkUrlExists($url)
+    {
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request for speed
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+            curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            // Accept 200 OK or 301/302 Redirects
+            return $code >= 200 && $code < 400;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
